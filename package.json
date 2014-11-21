@@ -1,0 +1,11 @@
+{
+    "name":     "w3c-spec-generator"
+,   "version":  "0.0.1"
+,   "private":  true
+,   "license": "MIT"
+,   "dependencies": {
+        "respec":       "3.2.7"
+    ,   "phantomjs":    "1.9.12"
+    ,   "express":      "4.10.2"
+    }
+}
