@@ -4,7 +4,7 @@
 ,   "private":  true
 ,   "license": "MIT"
 ,   "dependencies": {
-        "respec":       "3.2.7"
+        "respec":       "3.2.28"
     ,   "phantomjs":    "1.9.12"
     ,   "express":      "4.10.2"
     }
