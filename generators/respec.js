@@ -17,7 +17,7 @@ exports.generate = function (url, params, cb) {
     console.log("Generating", url);
     // Phantom's own timeouts are never reaching us for some reason, so we do our own
     var timedout = false;
-    setTimeout(
+    var tickingBomb = setTimeout(
         function () {
             timedout = true;
             cb({ status: 500, message: "Processing timed out." });
@@ -29,8 +29,8 @@ exports.generate = function (url, params, cb) {
     ,   ["--ssl-protocol=any", r2hPath, url]
     ,   function (err, stdout, stderr) {
             if (timedout) return;
-            // note: Phantom prints error on stdout even when you use console.error()
-            if (err) return cb({ status: 500, message: err + "\n" + (stderr || stdout || "") });
+            clearTimeout(tickingBomb);
+            if (err) return cb({ status: 500, message: err + "\n" + (stderr || "") });
             cb(null, stdout);
         }
     );
