@@ -11,9 +11,6 @@ query string. If the call is successful the generated content of the specificati
 * `type` (required). The type of generator for this content. Currently the only supported value is
   `respec`.
 * `url` (required). The URL of the draft to fetch and generate from.
-* `shortName`. The TR short name to use.
-* `previousPublishDate`. The date on which the previous version of this draft was published.
-* `previousMaturity`. The previous maturity level for this draft.
 * `publishDate`. The date at which the publication of this draft is supposed to occur.
 
 ### Errors
