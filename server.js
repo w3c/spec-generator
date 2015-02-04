@@ -34,7 +34,7 @@ app.get("/", function (req, res) {
     if (req.query.publishDate) params.publishDate = req.query.publishDate;
     else {
         var d = new Date();
-        params.publishDate = [d.getFullYear(), num2(d.getMonth() + 1), num2(d.getDay())].join("-");
+        params.publishDate = [d.getFullYear(), num2(d.getMonth() + 1), num2(d.getDate())].join("-");
     }
 
     // if shortName was provided, we collect info on previous version
