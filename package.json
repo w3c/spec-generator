@@ -7,5 +7,7 @@
         "respec":       "3.2.28"
     ,   "phantomjs":    "1.9.12"
     ,   "express":      "4.10.2"
+    ,   "request":      "~2.51.0"
+    ,   "xml2js":      "~0.4.4"
     }
 }
