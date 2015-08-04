@@ -1,6 +1,5 @@
 
 var express = require("express")
-,   w3cmetadata = require("./lib/w3c-metadata")
 ,   urlparser = require("url")
 ,   querystring = require("querystring")
 ,   app = express()
@@ -12,6 +11,7 @@ var express = require("express")
         if (str.length >= 2) return str;
         return "0" + str;
     }
+,   request = require("request")
 ;
 
 // Listens to GET at the root, expects two required query string parameters:
@@ -39,16 +39,35 @@ app.get("/", function (req, res) {
 
     // if shortName was provided, we collect info on previous version
     if (shortName) {
-        w3cmetadata.previousVersion("http://www.w3.org/TR/"
-                                    + shortName + "/",
-                                    params.publishDate,
-                                    function(err, prev) {
-                                        if (err) return res.status(400).json({error: err});
-                                        params.previousMaturity = prev.status;
-                                        params.previousPublishDate = prev.rawDate;
-
-                                        generate();
-                                    });
+     request.get("http://www.w3.org/TR/" + shortName + "/", function(error, response, body) {
+       if (error) return res.status(400).json({error: err});
+       var $   = require('whacko').load(body)
+       ,   $dl = $("body div.head dl")
+       ,   thisURI
+       ,   previousURI;
+       if ($dl) {
+         $dl.find("dt").each(function() {
+           var $dt = $(this)
+               txt = $dt.text()
+                        .toLowerCase()
+                        .replace(":", "")
+                        .replace("published ", "");
+               $dd = $dt.next();
+           if (txt === "this version") {
+             thisURI = $dd.find('a').attr('href');
+           }
+           else if (/^previous version(?:s)?$/.test(txt))
+             previousURI = $dd.find('a').first().attr('href');
+         })
+       }
+       var thisDate = thisURI.match(/[1-2][0-9]{7}/)[0]
+       ,   prev     = (thisDate === params.publishDate.replace(/\-/g, '')) ? previousURI : thisURI
+       ,   pDate    = prev.match(/[1-2][0-9]{7}/)[0];
+       params.previousMaturity = prev.match(/\/TR\/[0-9]{4}\/([A-Z]+)/)[1];
+       params.previousPublishDate = pDate.substring(0, 4) + '-' +
+         pDate.substring(4, 6) + '-' + pDate.substring(6, 8);
+       generate();
+     });
     } else {
         generate();
     }
