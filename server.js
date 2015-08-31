@@ -40,7 +40,7 @@ app.get("/", function (req, res) {
     // if shortName was provided, we collect info on previous version
     if (shortName) {
      request.get("http://www.w3.org/TR/" + shortName + "/", function(error, response, body) {
-       if (error) return res.status(400).json({error: err});
+       if (error) return res.status(400).json({error: error});
        var $   = require('whacko').load(body)
        ,   $dl = $("body div.head dl")
        ,   thisURI
@@ -51,7 +51,8 @@ app.get("/", function (req, res) {
                txt = $dt.text()
                         .toLowerCase()
                         .replace(":", "")
-                        .replace("published ", "");
+                        .replace("published ", "")
+                        .trim();
                $dd = $dt.next();
            if (txt === "this version") {
              thisURI = $dd.find('a').attr('href');
@@ -60,6 +61,7 @@ app.get("/", function (req, res) {
              previousURI = $dd.find('a').first().attr('href');
          })
        }
+       if (!thisURI) return res.status(500).json({ error: "Couldn't find a 'This version' uri in the previous version." });
        var thisDate = thisURI.match(/[1-2][0-9]{7}/)[0]
        ,   prev     = (thisDate === params.publishDate.replace(/\-/g, '')) ? previousURI : thisURI
        ,   pDate    = prev.match(/[1-2][0-9]{7}/)[0];
