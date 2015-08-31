@@ -61,6 +61,7 @@ app.get("/", function (req, res) {
              previousURI = $dd.find('a').first().attr('href');
          })
        }
+       if (!thisURI) return res.status(500).json({ error: "Couldn't find a 'This version' uri in the previous version." });
        var thisDate = thisURI.match(/[1-2][0-9]{7}/)[0]
        ,   prev     = (thisDate === params.publishDate.replace(/\-/g, '')) ? previousURI : thisURI
        ,   pDate    = prev.match(/[1-2][0-9]{7}/)[0];
