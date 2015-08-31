@@ -40,7 +40,7 @@ app.get("/", function (req, res) {
     // if shortName was provided, we collect info on previous version
     if (shortName) {
      request.get("http://www.w3.org/TR/" + shortName + "/", function(error, response, body) {
-       if (error) return res.status(400).json({error: err});
+       if (error) return res.status(400).json({error: error});
        var $   = require('whacko').load(body)
        ,   $dl = $("body div.head dl")
        ,   thisURI
