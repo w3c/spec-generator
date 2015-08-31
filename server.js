@@ -51,7 +51,8 @@ app.get("/", function (req, res) {
                txt = $dt.text()
                         .toLowerCase()
                         .replace(":", "")
-                        .replace("published ", "");
+                        .replace("published ", "")
+                        .trim();
                $dd = $dt.next();
            if (txt === "this version") {
              thisURI = $dd.find('a').attr('href');
