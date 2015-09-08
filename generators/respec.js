@@ -27,7 +27,7 @@ exports.generate = function (url, params, cb) {
     execFile(
         phantom.path
     ,   ["--ssl-protocol=any", r2hPath, url]
-    ,   { maxBuffer: 400*1024 } // default * 2
+    ,   { maxBuffer: 800*1024 } // default * 2
     ,   function (err, stdout, stderr) {
             if (timedout) return;
             clearTimeout(tickingBomb);
