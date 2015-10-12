@@ -1,13 +1,17 @@
 {
     "name":     "w3c-spec-generator"
-,   "version":  "0.0.1"
+,   "version":  "0.0.2"
 ,   "private":  true
 ,   "license": "MIT"
 ,   "dependencies": {
         "respec":       "3.2.28"
-    ,   "phantomjs":    "1.9.12"
+    ,   "phantomjs":    "1.9.18"
     ,   "express":      "4.10.2"
     ,   "request":      "~2.51.0"
     ,   "whacko":       "^0.18.1"
+    },
+    "engines": {
+        "node": ">=4.1.2",
+        "npm": ">=3.3.6"
     }
 }
