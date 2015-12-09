@@ -22,7 +22,7 @@ exports.generate = function (url, params, cb) {
             timedout = true;
             cb({ status: 500, message: "Processing timed out." });
         }
-    ,   12000
+    ,   20000
     );
     var childProcess = spawn(
         phantom.path
