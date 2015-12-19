@@ -26,7 +26,7 @@ exports.generate = function (url, params, cb) {
     );
     var childProcess = spawn(
         phantom.path
-    ,   ["--ssl-protocol=any", r2hPath, url]
+    ,   ["--ssl-protocol=any", r2hPath, "--exclude-script", "https://www.w3.org/scripts/", url]
     ,   { detached: true }
     );
 
