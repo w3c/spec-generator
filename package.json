@@ -5,7 +5,7 @@
 ,   "license": "MIT"
 ,   "dependencies": {
         "express":      "^4.13.3"
-    ,   "phantomjs":    "^1.9.19"
+    ,   "phantomjs":    "^2.1.7"
     ,   "request":      "^2.67.0"
     ,   "respec":       "3.2.x"
     ,   "whacko":       "^0.18.1"
