@@ -1,10 +1,7 @@
 
-var phantom = require("phantomjs")
-,   spawn = require("child_process").spawn
-,   jn = require("path").join
-,   u = require("url")
+var u = require("url")
 ,   querystring = require("querystring")
-,   r2hPath = jn(__dirname, "../node_modules/respec/tools/respec2html.js")
+,   respecWriter = require("respec/tools/respecDocWriter").fetchAndWrite
 ;
 
 exports.generate = function (url, params, cb) {
@@ -15,41 +12,10 @@ exports.generate = function (url, params, cb) {
     url.search = querystring.stringify(qs, ";");
     url = u.format(url);
     console.log("Generating", url);
-    // Phantom's own timeouts are never reaching us for some reason, so we do our own
-    var timedout = false;
-    var tickingBomb = setTimeout(
-        function () {
-            timedout = true;
-            cb({ status: 500, message: "Processing timed out." });
-        }
-    ,   20000
-    );
-    var childProcess = spawn(
-        phantom.path
-    ,   ["--ssl-protocol=any", r2hPath, "--exclude-script", "https://www.w3.org/scripts/", url]
-    ,   { detached: true }
-    );
 
-    var invokedCallBack = false;
-    var content = "";
-    var error = "";
-    childProcess.stdout.setEncoding("utf-8");
-    childProcess.stdout.on('data', function (chunk) {
-        content += chunk;
-    });
-    childProcess.stderr.on('data', function (chunk) {
-        error += chunk;
-    });
-    childProcess.on("error",   function (err) {
-        if (timedout || invokedCallBack) return;
-        invokedCallBack = true;
-        clearTimeout(tickingBomb);
+    respecWriter(url, '/dev/null', {}, 20000).then(function(html) {
+        cb(null, html);
+    }).catch(function (err) {
         cb({ status: 500, message: err + "\n" + error });
-    });
-    childProcess.on("close",   function () {
-        if (timedout || invokedCallBack) return;
-        invokedCallBack = true;
-        clearTimeout(tickingBomb);
-        cb(null, content);
     });
 };
