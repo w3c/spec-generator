@@ -1,6 +1,5 @@
 
-var jn = require("path").join
-,   u = require("url")
+var u = require("url")
 ,   querystring = require("querystring")
 ,   respecWriter = require("respec/tools/respecDocWriter").fetchAndWrite
 ;
