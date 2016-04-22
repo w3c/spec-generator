@@ -33,3 +33,9 @@ of optional ones that the API supports), and a callback to invoke upon completio
 If there is an error, the callback's first argument must be an object with a `status` field being
 an HTTP error code and a `message` field containing the error message. If the generator is
 successful the first argument is `null` and the second is the generated content.
+
+## Running
+
+The generator for ReSpec requires a running X server; in a headless environment, you will need to run it in connection with a Xvfb instance.
+
+A sufficient (but perhaps more than necessary) set of packages in a Debian/Ubuntu environment is `xvfb x11-xkb-utils xfonts-100dpi xfonts-75dpi xfonts-scalable xfonts-cyrillic x11-apps clang libdbus-1-dev libgtk2.0-dev libnotify-dev libgnome-keyring-dev libgconf2-dev libasound2-dev libcap-dev libcups2-dev libxtst-dev libxss1 libnss3-dev gcc-multilib g++-multilib`.
