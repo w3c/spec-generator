@@ -36,6 +36,10 @@ successful the first argument is `null` and the second is the generated content.
 
 ## Running
 
-The generator for ReSpec requires a running X server; in a headless environment, you will need to run it in connection with a Xvfb instance.
+The generator for ReSpec requires a running X server; in a headless environment, you will need to run it in connection with a Xvfb instance:
+```sh
+Xvfb :3  &  # (where 3 is the display port)
+DISPLAY=:3 node server.js
+```
 
 A sufficient (but perhaps more than necessary) set of packages in a Debian/Ubuntu environment is `xvfb x11-xkb-utils xfonts-100dpi xfonts-75dpi xfonts-scalable xfonts-cyrillic x11-apps clang libdbus-1-dev libgtk2.0-dev libnotify-dev libgnome-keyring-dev libgconf2-dev libasound2-dev libcap-dev libcups2-dev libxtst-dev libxss1 libnss3-dev gcc-multilib g++-multilib`.
