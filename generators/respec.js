@@ -16,6 +16,6 @@ exports.generate = function (url, params, cb) {
     respecWriter(url, '/dev/null', {}, 20000).then(function(html) {
         cb(null, html);
     }).catch(function (err) {
-        cb({ status: 500, message: err + "\n" + error });
+        cb({ status: 500, message: err.message });
     });
 };
