@@ -1,3 +1,4 @@
+[![Greenkeeper badge](https://badges.greenkeeper.io/w3c/spec-generator.svg)](https://greenkeeper.io/)
 
 # Spec Generator
 
