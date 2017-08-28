@@ -4,10 +4,10 @@
 ,   "private":  true
 ,   "license": "MIT"
 ,   "dependencies": {
-        "express":      "^4.13.3"
-    ,   "request":      "^2.67.0"
-    ,   "respec":       "^15.0.0"
-    ,   "whacko":       "^0.18.1"
+        "express":      "4.15"
+    ,   "request":      "2.81"
+    ,   "respec":       "15.7"
+    ,   "whacko":       "0.19"
     },
     "engines": {
         "node": ">=5.10",
