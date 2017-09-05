@@ -6,7 +6,7 @@
 ,   "dependencies": {
         "express":      "4.15"
     ,   "request":      "2.81"
-    ,   "respec":       "15.7"
+    ,   "respec":       "~16.2.2"
     ,   "whacko":       "0.19"
     },
     "engines": {
