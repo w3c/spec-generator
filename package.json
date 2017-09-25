@@ -4,7 +4,7 @@
 ,   "private":  true
 ,   "license": "MIT"
 ,   "dependencies": {
-        "express":      "4.15.4"
+        "express":      "5.0.0-alpha.6"
     ,   "request":      "2.82.0"
     ,   "respec":       "16.2.2"
     ,   "whacko":       "0.19.1"
