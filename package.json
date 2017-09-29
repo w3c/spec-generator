@@ -1,16 +1,16 @@
 {
-    "name":     "w3c-spec-generator"
-,   "version":  "0.0.2"
-,   "private":  true
-,   "license": "MIT"
-,   "dependencies": {
-        "express":      "4.15.4"
-    ,   "request":      "2.83.0"
-    ,   "respec":       "16.2.2"
-    ,   "whacko":       "0.19.1"
-    },
-    "engines": {
-        "node": ">=5.10",
-        "npm": ">=3.3.6"
-    }
+  "name": "w3c-spec-generator",
+  "version": "0.0.3",
+  "private": true,
+  "license": "MIT",
+  "dependencies": {
+    "express": "4.16.0",
+    "request": "2.83.0",
+    "respec": "16.2.2",
+    "whacko": "0.19.1"
+  },
+  "engines": {
+    "node": ">=5.10",
+    "npm": ">=3.3.6"
+  }
 }
