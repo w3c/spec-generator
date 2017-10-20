@@ -6,11 +6,11 @@
   "dependencies": {
     "express": "4.16.0",
     "request": "2.83.0",
-    "respec": "17.1.0",
+    "respec": "17.1.1",
     "whacko": "0.19.1"
   },
   "engines": {
-    "node": ">=5.10",
-    "npm": ">=3.3.6"
+    "node": ">=8",
+    "npm": ">=5"
   }
 }
