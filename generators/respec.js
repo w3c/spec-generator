@@ -13,7 +13,7 @@ exports.generate = function (url, params, cb) {
     url = u.format(url);
     console.log("Generating", url);
 
-    respecWriter(url, '/dev/null', {}, 20000).then(function(html) {
+    respecWriter(url, '/dev/null', {}, {timeout: 20000, disableSandbox: true}).then(function(html) {
         cb(null, html);
     }).catch(function (err) {
         cb({ status: 500, message: err.message });
