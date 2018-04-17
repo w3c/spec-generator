@@ -1,0 +1,16 @@
+language: node_js
+dist: trusty
+node_js:
+  - lts/*
+
+install:
+  - npm install
+
+cache:
+  directories:
+  - node_modules
+
+script:
+  - npx respec2html -e --timeout 30 --src https://w3c.github.io/manifest/ --out /dev/null
+  - npx respec2html -e --timeout 30 --src https://w3c.github.io/payment-request/ --out /dev/null
+  - npx respec2html -e --timeout 30 --src https://w3c.github.io/resource-hints/ --out /dev/null
