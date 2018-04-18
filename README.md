@@ -6,6 +6,20 @@ This exposes a service to automatically generate specs from various source forma
 
 ## API
 
+### Via HTTP
+
+Start the server listening on port 80 by default:
+
+```bash
+node server
+```
+
+You can specify a port like so:
+
+```bash
+PORT=3000 node server
+```
+
 Spec Generator has a single endpoint, which is a `GET /`. This endpoint accepts parameters on its
 query string. If the call is successful the generated content of the specification is returned.
 
@@ -13,6 +27,15 @@ query string. If the call is successful the generated content of the specificati
   `respec`.
 * `url` (required). The URL of the draft to fetch and generate from.
 * `publishDate`. The date at which the publication of this draft is supposed to occur.
+
+### As a Node.js module
+
+```js
+const SPEC_GEN = require('w3c-spec-generator');
+const SERVER = SPEC_GEN.start();    // Optional port number (80 by default)
+// Now Spec Generator is listening on port 80
+SERVER.close();    // To stop the server
+```
 
 ### Errors
 
