@@ -6,7 +6,7 @@
   "dependencies": {
     "express": "4.16.3",
     "request": "2.85.0",
-    "respec": "20.7.2",
+    "respec": "20.8.0",
     "whacko": "0.19.1"
   },
   "engines": {
