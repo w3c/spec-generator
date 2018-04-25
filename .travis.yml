@@ -14,3 +14,4 @@ script:
   - npx respec2html -e --timeout 30 --src https://w3c.github.io/manifest/\?$AUTHORIZATION --out /dev/null
   - npx respec2html -e --timeout 30 --src https://w3c.github.io/payment-request/\?$AUTHORIZATION --out /dev/null
   - npx respec2html -e --timeout 30 --src https://w3c.github.io/resource-hints/\?$AUTHORIZATION --out /dev/null
+  
