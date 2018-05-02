@@ -11,7 +11,7 @@ env:
   global:
     secure: MjDshKvtPtTlGXHDjks/FZnpL6+DaDSqOlOslDPfH/lut+F1X4B0zizgah9by+1paQJ/1I3rUc8511wH9AmXsx9ivIvbFUMngArvgn7N8ONZQojCp4CjJVHN90HNh0FWL566La6xa9zbSHcg/wmsSMc9qX1nmLZpPPuSxosQcGQ=
 script:
-  - npx respec2html -e --timeout 30 --src https://w3c.github.io/manifest/\?$AUTHORIZATION --out /dev/null
-  - npx respec2html -e --timeout 30 --src https://w3c.github.io/payment-request/\?$AUTHORIZATION --out /dev/null
-  - npx respec2html -e --timeout 30 --src https://w3c.github.io/resource-hints/\?$AUTHORIZATION --out /dev/null
+  - npx respec2html -e --timeout 30 --src "https://w3c.github.io/manifest/?$AUTHORIZATION" --out /dev/null
+  - npx respec2html -e --timeout 30 --src "https://w3c.github.io/payment-request/?$AUTHORIZATION" --out /dev/null
+  - npx respec2html -e --timeout 30 --src "https://w3c.github.io/resource-hints/?$AUTHORIZATION" --out /dev/null
   
