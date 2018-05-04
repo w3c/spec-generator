@@ -6,7 +6,7 @@ const ASSERT = require('assert'),
 
 const PORT = 3000,
   AUTHORIZATION = encodeURIComponent(process.env.AUTHORIZATION),
-  BASE_URL = `http://localhost:3000/`,
+  BASE_URL = 'http://localhost:3000/',
   NO_URL = '&type=foo&URL=notice-that-its-in-uppercase',
   NO_TYPE = '&url=foo&TYPE=notice-that-its-in-uppercase',
   BAD_GENERATOR = '&type=fluxor&url=http://example.com/',
