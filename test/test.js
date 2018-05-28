@@ -7,14 +7,14 @@ const ASSERT = require('assert'),
 const PORT = 3000,
   AUTHORIZATION = encodeURIComponent(process.env.AUTHORIZATION),
   BASE_URL = 'http://localhost:3000/',
-  NO_URL = '&type=foo&URL=notice-that-its-in-uppercase',
-  NO_TYPE = '&url=foo&TYPE=notice-that-its-in-uppercase',
-  BAD_GENERATOR = '&type=fluxor&url=http://example.com/',
-  BAD_SHORTNAME = '&type=RESPEC&url=http://example.com/%3FshortName%3Ddiplodocus',
-  NO_RESPEC = '&type=RESPEC&url=http://example.com/',
-  SUCCESS1 = `&type=respec&url=https://w3c.github.io/manifest/%3F${AUTHORIZATION}`,
-  SUCCESS2 = `&type=respec&url=https://w3c.github.io/payment-request/%3F${AUTHORIZATION}`,
-  SUCCESS3 = `&type=respec&url=https://w3c.github.io/resource-hints/%3F${AUTHORIZATION}`;
+  NO_URL = '?type=foo&URL=notice-that-its-in-uppercase',
+  NO_TYPE = '?url=foo&TYPE=notice-that-its-in-uppercase',
+  BAD_GENERATOR = '?type=fluxor&url=http://example.com/',
+  BAD_SHORTNAME = '?type=RESPEC&url=http://example.com/%3FshortName%3Ddiplodocus',
+  NO_RESPEC = '?type=RESPEC&url=http://example.com/',
+  SUCCESS1 = `?type=respec&url=https://w3c.github.io/manifest/%3F${AUTHORIZATION}`,
+  SUCCESS2 = `?type=respec&url=https://w3c.github.io/payment-request/%3F${AUTHORIZATION}`,
+  SUCCESS3 = `?type=respec&url=https://w3c.github.io/resource-hints/%3F${AUTHORIZATION}`;
 
 const FAILS_WITH = (done, expectedMessage = '{"error":"Both \'type\' and \'url\' are required."}', expectedCode = 500) =>
   (error, response, body) => {
