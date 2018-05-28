@@ -11,3 +11,12 @@ script:
   - npx respec2html -e --timeout 30 --src https://w3c.github.io/manifest/?$AUTHORIZATION --out /dev/null
   - npx respec2html -e --timeout 30 --src https://w3c.github.io/payment-request/?$AUTHORIZATION --out /dev/null
   - npx respec2html -e --timeout 30 --src https://w3c.github.io/resource-hints/?$AUTHORIZATION --out /dev/null
+  - npm test
+notifications:
+  email: false
+  irc:
+    channels:
+      - "irc.w3.org#pub"
+    skip_join: true
+    template:
+      - "%{branch} by %{author} (%{build_url}): %{message}"

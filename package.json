@@ -9,8 +9,14 @@
     "respec": "20.10.2",
     "whacko": "0.19.1"
   },
+  "devDependencies": {
+    "mocha": "5.1.0"
+  },
   "engines": {
     "node": ">=5.10",
     "npm": ">=3.3.6"
+  },
+  "scripts": {
+    "test": "mocha"
   }
 }

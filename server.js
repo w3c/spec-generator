@@ -39,37 +39,40 @@ app.get("/", function (req, res) {
 
     // if shortName was provided, we collect info on previous version
     if (shortName) {
-     request.get("http://www.w3.org/TR/" + shortName + "/", function(error, response, body) {
-       if (error) return res.status(400).json({error: error});
-       var $   = require('whacko').load(body)
-       ,   $dl = $("body div.head dl")
-       ,   thisURI
-       ,   previousURI;
-       if ($dl) {
-         $dl.find("dt").each(function() {
-           var $dt = $(this)
-               txt = $dt.text()
-                        .toLowerCase()
-                        .replace(":", "")
-                        .replace("published ", "")
-                        .trim();
-               $dd = $dt.next();
-           if (txt === "this version") {
-             thisURI = $dd.find('a').attr('href');
-           }
-           else if (/^previous version(?:s)?$/.test(txt))
-             previousURI = $dd.find('a').first().attr('href');
-         })
-       }
-       if (!thisURI) return res.status(500).json({ error: "Couldn't find a 'This version' uri in the previous version." });
-       var thisDate = thisURI.match(/[1-2][0-9]{7}/)[0]
-       ,   prev     = (thisDate === params.publishDate.replace(/\-/g, '')) ? previousURI : thisURI
-       ,   pDate    = prev.match(/[1-2][0-9]{7}/)[0];
-       params.previousMaturity = prev.match(/\/TR\/[0-9]{4}\/([A-Z]+)/)[1];
-       params.previousPublishDate = pDate.substring(0, 4) + '-' +
-         pDate.substring(4, 6) + '-' + pDate.substring(6, 8);
-       generate();
-     });
+        request.get("https://www.w3.org/TR/" + shortName + "/", function(error, response, body) {
+            if (error)
+                return res.status(400).json({error: error});
+            else if (response && response.statusCode >= 400 && response.statusCode < 500)
+                return res.status(response.statusCode).json({error: response.statusMessage});
+            var $   = require('whacko').load(body)
+            ,   $dl = $("body div.head dl")
+            ,   thisURI
+            ,   previousURI;
+            if ($dl) {
+                $dl.find("dt").each(function() {
+                    var $dt = $(this)
+                    txt = $dt.text()
+                    .toLowerCase()
+                    .replace(":", "")
+                    .replace("published ", "")
+                    .trim();
+                    $dd = $dt.next();
+                    if (txt === "this version") {
+                        thisURI = $dd.find('a').attr('href');
+                    }
+                    else if (/^previous version(?:s)?$/.test(txt))
+                    previousURI = $dd.find('a').first().attr('href');
+                })
+            }
+            if (!thisURI) return res.status(500).json({ error: "Couldn't find a 'This version' uri in the previous version." });
+            var thisDate = thisURI.match(/[1-2][0-9]{7}/)[0]
+            ,   prev     = (thisDate === params.publishDate.replace(/\-/g, '')) ? previousURI : thisURI
+            ,   pDate    = prev.match(/[1-2][0-9]{7}/)[0];
+            params.previousMaturity = prev.match(/\/TR\/[0-9]{4}\/([A-Z]+)/)[1];
+            params.previousPublishDate = pDate.substring(0, 4) + '-' +
+            pDate.substring(4, 6) + '-' + pDate.substring(6, 8);
+            generate();
+        });
     } else {
         generate();
     }
@@ -82,4 +85,22 @@ app.get("/", function (req, res) {
         });
     }
 });
-app.listen(process.env.PORT || 80);
+
+/**
+* Start listening for HTTP requests.
+*
+* @param {Number} port - port number to use (optional); defaults to environment variable `$PORT` if exists, and to `80` if not
+* @returns {Object} a `http.Server`; cf https://nodejs.org/dist/latest-v8.x/docs/api/http.html#http_class_http_server
+*/
+
+app.start = (port) => {
+    if (port)
+        return app.listen(port);
+    else
+        return app.listen(process.env.PORT || 80);
+};
+
+if (module === process.mainModule)
+    app.start();
+else
+    module.exports = app;
