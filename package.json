@@ -5,7 +5,7 @@
   "license": "MIT",
   "dependencies": {
     "express": "4.16.3",
-    "request": "2.85.0",
+    "request": "2.86.0",
     "respec": "20.10.2",
     "whacko": "0.19.1"
   },
