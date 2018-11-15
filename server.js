@@ -28,7 +28,7 @@ app.get("/", function (req, res) {
 
     // We look if the provided URL comes with a shortName in the query string
     var urlComponents = urlparser.parse(url);
-    var qs = querystring.parse(urlComponents.query, ';')
+    var qs = querystring.parse(urlComponents.query, '&')
     shortName = qs.shortName;
 
     if (req.query.publishDate) params.publishDate = req.query.publishDate;
