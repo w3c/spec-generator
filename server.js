@@ -76,7 +76,7 @@ app.get("/", function (req, res) {
 
     async function generate(url) {
         // if there's an error we get an err object with status and message, otherwise we get content
-        try{
+        try {
             const content = await genMap[type](url);
             res.send(content);
         } catch (err) {
