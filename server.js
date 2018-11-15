@@ -68,18 +68,20 @@ app.get("/", function (req, res) {
             specURL.searchParams.set("previousMaturity", prev.match(/\/TR\/[0-9]{4}\/([A-Z]+)/)[1]);
             specURL.searchParams.set("previousPublishDate", pDate.substring(0, 4) + '-' +
             pDate.substring(4, 6) + '-' + pDate.substring(6, 8));
-            generate();
+            generate(specURL.href);
         });
     } else {
-        generate();
+        generate(specURL.href);
     }
 
-    function generate() {
+    async function generate(url) {
         // if there's an error we get an err object with status and message, otherwise we get content
-        genMap[type](specURL.href, {}, function (err, content) {
-            if (err) return res.status(err.status).json({ error: err.message });
+        try{
+            const content = await genMap[type](url);
             res.send(content);
-        });
+        } catch (err) {
+            res.status(err.status).json({ error: err.message });
+        }
     }
 });
 
