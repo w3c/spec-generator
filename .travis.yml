@@ -8,9 +8,9 @@ cache:
   directories:
   - node_modules
 script:
-  - npx respec2html -e --timeout 30 --src https://w3c.github.io/manifest/?githubToken=$GH_TOKEN --out /dev/null
-  - npx respec2html -e --timeout 30 --src https://w3c.github.io/payment-request/?githubToken=$GH_TOKEN --out /dev/null
-  - npx respec2html -e --timeout 30 --src https://w3c.github.io/resource-hints/?githubToken=$GH_TOKEN --out /dev/null
+  - npx respec2html -e --timeout 30 --src https://w3c.github.io/manifest/?githubToken=$GH_TOKEN&githubUser=$GH_USER --out /dev/null
+  - npx respec2html -e --timeout 30 --src https://w3c.github.io/payment-request/?githubToken=$GH_TOKEN&githubUser=$GH_USER --out /dev/null
+  - npx respec2html -e --timeout 30 --src https://w3c.github.io/resource-hints/?githubToken=$GH_TOKEN&githubUser=$GH_USER --out /dev/null
   - npm test
 notifications:
   email: false
