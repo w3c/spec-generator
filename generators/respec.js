@@ -7,7 +7,7 @@ exports.generate = async function generate(urlToGenerate, params, cb) {
   }
   const opts = { timeout: 20000, disableSandbox: true };
   try {
-    console.log("Generating", url);
+    console.log("Generating", url.href);
     const html = await respecWriter(url.href, "/dev/null", {}, opts);
     cb(null, html);
   } catch (err) {
