@@ -18,7 +18,6 @@ var express = require("express")
 app.get("/", function (req, res) {
     var type = (req.query.type || "").toLowerCase()
     ,   url = req.query.url ? decodeURIComponent(req.query.url) : undefined
-    ,   params = {}
     ;
     if (!url || !type) return res.status(500).json({ error: "Both 'type' and 'url' are required." });
     if (!genMap[type]) return res.status(500).json({ error: "Unknown generator: " + type });
@@ -26,13 +25,14 @@ app.get("/", function (req, res) {
     var specURL = new URL(url);
     var shortName = specURL.searchParams.get("shortName");
 
+    let publishDate;
     if (req.query.publishDate) {
-        specURL.searchParams.set("publishDate", req.query.publishDate);
+        publishDate = req.query.publishDate;
     } else {
         const d = new Date();
-        const publishDate = [d.getFullYear(), num2(d.getMonth() + 1), num2(d.getDate())].join("-");
-        specURL.searchParams.set("publishDate", publishDate);
+        publishDate = [d.getFullYear(), num2(d.getMonth() + 1), num2(d.getDate())].join("-");
     }
+    specURL.searchParams.set("publishDate", publishDate);
 
     // if shortName was provided, we collect info on previous version
     if (shortName) {
@@ -63,7 +63,7 @@ app.get("/", function (req, res) {
             }
             if (!thisURI) return res.status(500).json({ error: "Couldn't find a 'This version' uri in the previous version." });
             var thisDate = thisURI.match(/[1-2][0-9]{7}/)[0]
-            ,   prev     = (thisDate === params.publishDate.replace(/\-/g, '')) ? previousURI : thisURI
+            ,   prev     = (thisDate === publishDate.replace(/\-/g, '')) ? previousURI : thisURI
             ,   pDate    = prev.match(/[1-2][0-9]{7}/)[0];
             specURL.searchParams.set("previousMaturity", prev.match(/\/TR\/[0-9]{4}\/([A-Z]+)/)[1]);
             specURL.searchParams.set("previousPublishDate", pDate.substring(0, 4) + '-' +
