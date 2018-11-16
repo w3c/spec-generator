@@ -1,21 +1,19 @@
+const { fetchAndWrite: respecWriter } = require("respec/tools/respecDocWriter");
 
-var u = require("url")
-,   querystring = require("querystring")
-,   respecWriter = require("respec/tools/respecDocWriter").fetchAndWrite
-;
+class SpecGeneratorError extends Error {
+  constructor({ status, message }) {
+    super(message);
+    this.status = status;
+  }
+}
 
-exports.generate = function (url, params, cb) {
-    url = u.parse(url);
-    // respec use ";" as query string separators
-    var qs = querystring.parse(url.query, ";")
-    for (var k in params) if (params.hasOwnProperty(k)) qs[k] = params[k];
-    url.search = querystring.stringify(qs, ";");
-    url = u.format(url);
+exports.generate = async function generate(url) {
+  const opts = { timeout: 20000, disableSandbox: true };
+  try {
     console.log("Generating", url);
-
-    respecWriter(url, '/dev/null', {}, {timeout: 20000, disableSandbox: true}).then(function(html) {
-        cb(null, html);
-    }).catch(function (err) {
-        cb({ status: 500, message: err.message });
-    });
+    const result = await respecWriter(url, "/dev/null", {}, opts);
+    return result;
+  } catch (err) {
+    throw new SpecGeneratorError({ status: 500, message: err.message });
+  }
 };
