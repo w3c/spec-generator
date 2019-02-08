@@ -10,6 +10,7 @@ var express = require("express")
         return "0" + str;
     }
 ,   request = require("request")
+,   URL = require('url').URL
 ;
 
 // Listens to GET at the root, expects two required query string parameters:
