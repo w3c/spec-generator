@@ -24,6 +24,8 @@ app.get("/", function (req, res) {
     if (!genMap[type]) return res.status(500).json({ error: "Unknown generator: " + type });
     // We look if the provided URL comes with a shortName in the query string
     var specURL = new URL(url);
+    if (specURL.hostname === "raw.githubusercontent.com")
+      return res.status(500).json({ error: "raw.githubusercontent.com URLs aren't supported. Use github pages instead."});
     var shortName = specURL.searchParams.get("shortName");
 
     let publishDate;
