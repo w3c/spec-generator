@@ -6,7 +6,7 @@
   "dependencies": {
     "express": "4.16.3",
     "request": "2.88.0",
-    "respec": "24.8.0",
+    "respec": "24.9.0",
     "whacko": "0.19.1"
   },
   "devDependencies": {
