@@ -10,7 +10,7 @@
     "whacko": "0.19.1"
   },
   "devDependencies": {
-    "mocha": "6.2.0"
+    "mocha": "6.2.1"
   },
   "engines": {
     "node": ">=5.10",
