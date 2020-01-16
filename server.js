@@ -112,7 +112,7 @@ app.post("/", async (req, res) => {
         } else {
             const file = req.files.file,
                   baseUrl = req.protocol + "://" + req.headers.host + '/',
-                  params = Object.keys(req.body).map(key => key + '=' + req.body[key]).join('&');
+                  params = req.body ? Object.keys(req.body).map(key => key + '=' + req.body[key]).join('&') : "";
                   src = baseUrl  + file.tempFilePath + ('?' + params || ""),
                   qs = {url: src, type: 'respec'};
             request.get({url: baseUrl, qs: qs}, (err, response, body) => {
