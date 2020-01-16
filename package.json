@@ -5,6 +5,7 @@
   "license": "MIT",
   "dependencies": {
     "express": "4.17.1",
+    "express-fileupload": "1.1.6",
     "request": "2.88.0",
     "respec": "25.0.1",
     "whacko": "0.19.1"
@@ -13,8 +14,8 @@
     "mocha": "6.2.2"
   },
   "engines": {
-    "node": ">=5.10",
-    "npm": ">=3.3.6"
+    "node": "8 || 10 || 12",
+    "npm": ">=6"
   },
   "scripts": {
     "test": "mocha"
