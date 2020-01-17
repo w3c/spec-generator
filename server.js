@@ -13,8 +13,8 @@ var express = require("express")
 ,   request = require("request")
 ,   URL = require('url').URL
 ,   fileUpload = require('express-fileupload')
+,   BASE_URI = process.env.BASE_URI || ""
 ;
-
 app.use(fileUpload({
     createParentPath: true,
     useTempFiles: true,
