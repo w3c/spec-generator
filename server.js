@@ -111,7 +111,7 @@ app.post("/", async (req, res) => {
             });
         } else {
             const file = req.files.file,
-                  baseUrl = req.protocol + "://" + req.headers.host + '/',
+                  baseUrl = req.protocol + "://" + req.headers.host + '/' + BASE_URI,
                   params = req.body ? Object.keys(req.body).map(key => key + '=' + req.body[key]).join('&') : "";
                   src = baseUrl  + file.tempFilePath + ('?' + params || ""),
                   qs = {url: src, type: 'respec'};
