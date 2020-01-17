@@ -12,7 +12,7 @@ var express = require("express")
 ,   path = require('path')
 ,   request = require("request")
 ,   URL = require('url').URL
-,   fileUpload = require('express-fileupload');
+,   fileUpload = require('express-fileupload')
 ;
 
 app.use(fileUpload({
