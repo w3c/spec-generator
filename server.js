@@ -9,9 +9,17 @@ var express = require("express")
         if (str.length >= 2) return str;
         return "0" + str;
     }
+,   path = require('path')
 ,   request = require("request")
 ,   URL = require('url').URL
+,   fileUpload = require('express-fileupload')
 ;
+
+app.use(fileUpload({
+    createParentPath: true,
+    useTempFiles: true,
+    tempFileDir: 'uploads/'
+}));
 
 // Listens to GET at the root, expects two required query string parameters:
 //  type:   the type of the generator (case-insensitive)
@@ -29,8 +37,8 @@ app.get("/", function (req, res) {
     var shortName = specURL.searchParams.get("shortName");
 
     let publishDate;
-    if (req.query.publishDate) {
-        publishDate = req.query.publishDate;
+    if (specURL.searchParams.get("publishDate")) {
+        publishDate = specURL.searchParams.get("publishDate");
     } else {
         const d = new Date();
         publishDate = [d.getFullYear(), num2(d.getMonth() + 1), num2(d.getDate())].join("-");
@@ -85,6 +93,40 @@ app.get("/", function (req, res) {
         } catch (err) {
             res.status(err.status).json({ error: err.message });
         }
+    }
+});
+
+app.use('/uploads', express.static('./uploads', {
+  setHeaders: (res, requestPath) => {
+      let noExtension = !Boolean(path.extname(requestPath));
+      if (noExtension) res.setHeader('Content-Type', 'text/html');
+    }}));
+
+app.post("/", async (req, res) => {
+    try {
+        if (!req.files) {
+            res.send({
+                status: 500,
+                message: 'No file uploaded'
+            });
+        } else {
+            const file = req.files.file,
+                  baseUrl = req.protocol + "://" + req.headers.host + '/',
+                  params = req.body ? Object.keys(req.body).map(key => key + '=' + req.body[key]).join('&') : "";
+                  src = baseUrl  + file.tempFilePath + ('?' + params || ""),
+                  qs = {url: src, type: 'respec'};
+            request.get({url: baseUrl, qs: qs}, (err, response, body) => {
+                if (err) {
+                    res.status(500).send(err);
+                } else {
+                    res.send(body);
+                    // delete temp file
+                    require("fs").promises.unlink(file.tempFilePath);
+                }
+            });
+        }
+    } catch (err) {
+        res.status(500).send(err);
     }
 });
 
