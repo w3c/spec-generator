@@ -1,7 +1,8 @@
 language: node_js
 dist: trusty
 node_js:
-- lts/*
+  - node
+  - lts/*
 install:
 - npm install
 cache:
