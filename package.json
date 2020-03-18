@@ -11,7 +11,7 @@
     "whacko": "0.19.1"
   },
   "devDependencies": {
-    "mocha": "7.1.0"
+    "mocha": "7.1.1"
   },
   "engines": {
     "node": "10 || 12",
