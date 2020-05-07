@@ -8,7 +8,8 @@
     "express-fileupload": "1.1.6",
     "request": "2.88.2",
     "respec": "25.6.2",
-    "whacko": "0.19.1"
+    "whacko": "0.19.1",
+    "snyk": "^1.319.1"
   },
   "devDependencies": {
     "mocha": "7.1.2"
@@ -18,6 +19,9 @@
     "npm": ">=6"
   },
   "scripts": {
-    "test": "mocha"
-  }
+    "test": "mocha",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
+  },
+  "snyk": true
 }
