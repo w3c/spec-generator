@@ -6,6 +6,8 @@ patch:
   SNYK-JS-LODASH-567746:
     - respec > opencollective > inquirer > lodash:
         patched: '2020-05-07T08:53:29.666Z'
+    - mocha > yargs-unparser > lodash:
+        patched: '2020-05-20T22:12:43.733Z'
   'npm:lodash:20180130':
     - whacko > lodash:
         patched: '2020-05-07T08:53:29.666Z'
