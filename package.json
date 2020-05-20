@@ -9,7 +9,7 @@
     "request": "2.88.2",
     "respec": "25.6.2",
     "whacko": "0.19.1",
-    "snyk": "^1.319.1"
+    "snyk": "^1.323.1"
   },
   "devDependencies": {
     "mocha": "7.1.2"
