@@ -1,5 +1,6 @@
 
 var express = require("express")
+,   { JSDOM } = require('jsdom')
 ,   app = express()
 ,   genMap = {
         respec: require("./generators/respec").generate
@@ -52,25 +53,23 @@ app.get("/", function (req, res) {
                 return res.status(400).json({error: error});
             else if (response && response.statusCode >= 400 && response.statusCode < 500)
                 return res.status(response.statusCode).json({error: response.statusMessage});
-            var $   = require('whacko').load(body)
-            ,   $dl = $("body div.head dl")
+            var document = (new JSDOM(body)).window.document
+            ,   dl = document.querySelector('body div.head dl')
             ,   thisURI
             ,   previousURI;
-            if ($dl) {
-                $dl.find("dt").each(function() {
-                    var $dt = $(this)
-                    txt = $dt.text()
-                    .toLowerCase()
-                    .replace(":", "")
-                    .replace("published ", "")
-                    .trim();
-                    $dd = $dt.next();
-                    if (txt === "this version") {
-                        thisURI = $dd.find('a').attr('href');
-                    }
+            if (dl) {
+                dl.querySelectorAll('dt').forEach(dt => {
+                    var txt = (dt.innerText || dt.textContent)
+                        .toLocaleLowerCase()
+                        .replace(':', '')
+                        .replace('published', '')
+                        .trim();
+                    var dd = dt.nextElementSibling;
+                    if (txt === "this version")
+                        thisURI = dd.querySelector('a').href;
                     else if (/^previous version(?:s)?$/.test(txt))
-                    previousURI = $dd.find('a').first().attr('href');
-                })
+                        previousURI = dd.querySelector('a').href;
+                });
             }
             if (!thisURI) return res.status(500).json({ error: "Couldn't find a 'This version' uri in the previous version." });
             var thisDate = thisURI.match(/[1-2][0-9]{7}/)[0]
