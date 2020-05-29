@@ -21,6 +21,12 @@ You can specify a port like so:
 PORT=3000 node server
 ```
 
+When developing, you can use auto-reload:
+
+```bash
+nodemon server
+```
+
 Spec Generator has a single endpoint, which is a `GET /`. This endpoint accepts parameters on its
 query string. If the call is successful the generated content of the specification is returned.
 

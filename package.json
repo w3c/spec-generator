@@ -1,27 +1,27 @@
 {
   "name": "w3c-spec-generator",
   "version": "0.3.9",
-  "private": true,
   "license": "MIT",
   "dependencies": {
     "express": "4.17.1",
     "express-fileupload": "1.1.6",
+    "jsdom": "16.2.2",
     "request": "2.88.2",
     "respec": "25.8.1",
-    "whacko": "0.19.1",
     "snyk": "^1.319.1"
   },
   "devDependencies": {
-    "mocha": "7.2.0"
+    "mocha": "7.2.0",
+    "nodemon": "2.0.4"
   },
   "engines": {
-    "node": "10 || 12",
+    "node": "10 || 12 || 14",
     "npm": ">=6"
   },
   "scripts": {
     "test": "mocha",
     "snyk-protect": "snyk protect",
-    "prepublish": "npm run snyk-protect"
+    "prepare": "npm run snyk-protect"
   },
   "snyk": true
 }
