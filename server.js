@@ -59,7 +59,7 @@ app.get("/", function (req, res) {
             ,   previousURI;
             if (dl) {
                 dl.querySelectorAll('dt').forEach(dt => {
-                    var txt = (dt.innerText || dt.textContent)
+                    var txt = dt.textContent
                         .toLocaleLowerCase()
                         .replace(':', '')
                         .replace('published', '')
