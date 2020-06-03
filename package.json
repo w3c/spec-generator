@@ -7,7 +7,7 @@
     "express-fileupload": "1.1.6",
     "jsdom": "16.2.2",
     "request": "2.88.2",
-    "respec": "25.8.1",
+    "respec": "25.9.0",
     "snyk": "^1.332.0"
   },
   "devDependencies": {
