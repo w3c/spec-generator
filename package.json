@@ -18,6 +18,6 @@
     "npm": ">=6"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha --timeout 30000"
   }
 }
