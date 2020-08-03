@@ -4,7 +4,7 @@
   "license": "MIT",
   "dependencies": {
     "express": "4.17.1",
-    "express-fileupload": "1.1.8",
+    "express-fileupload": "1.1.9",
     "jsdom": "16.3.0",
     "request": "2.88.2",
     "respec": "25.13.0"
