@@ -10,7 +10,7 @@
     "respec": "25.13.0"
   },
   "devDependencies": {
-    "mocha": "8.0.1",
+    "mocha": "8.1.0",
     "nodemon": "2.0.4"
   },
   "engines": {
