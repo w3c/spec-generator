@@ -99,9 +99,10 @@ app.use('/uploads', express.static('./uploads', {
   setHeaders: (res, requestPath) => {
       let noExtension = !Boolean(path.extname(requestPath));
       if (noExtension) res.setHeader('Content-Type', 'text/html');
-    }}));
+    }
+}));
 
-app.post("/", async (req, res) => {
+app.post("/", (req, res) => {
     try {
         if (!req.files) {
             res.send({
@@ -109,19 +110,76 @@ app.post("/", async (req, res) => {
                 message: 'No file uploaded'
             });
         } else {
-            const file = req.files.file,
-                  baseUrl = req.protocol + "://" + req.headers.host + '/' + BASE_URI,
-                  params = req.body ? Object.keys(req.body).map(key => key + '=' + req.body[key]).join('&') : "";
-                  src = baseUrl  + file.tempFilePath + ('?' + params || ""),
-                  qs = {url: src, type: 'respec'};
-            request.get({url: baseUrl, qs: qs}, (err, response, body) => {
-                if (err) {
-                    res.status(500).send(err);
-                } else {
-                    res.send(body);
-                    // delete temp file
-                    require("fs").promises.unlink(file.tempFilePath);
-                }
+            let file = req.files.file;
+            // file can be an html file or a tar file
+            const fileType = require('file-type');
+            const fs = require('fs');
+
+            fs.readFile(file.tempFilePath, (err, content) => {
+                fileType.fromBuffer(content).then(type => {
+                  let path = ""
+                  if (type && type.mime === 'application/x-tar') {
+                      // tar file
+                      var tar = require('tar-stream');
+                      var extract = tar.extract();
+                      var hasIndex = false;
+                      path = fs.mkdtempSync('uploads/');
+
+                      extract.on('entry', function (header, stream, next) {
+                        stream.on('data', function (data) {
+                          const isAllowed = function(name) {
+                              if (name.toLowerCase().indexOf('.htaccess') !== -1) return false;
+                              else if (name.toLowerCase().indexOf('.php') !== -1) return false;
+                              else if (name.indexOf('CVS') !== -1) return false;
+                              else if (name.indexOf('../') !== -1) return false;
+                              else if (name.indexOf('://') !== -1) return false;
+                              else return true;
+                          }
+
+                          if (isAllowed(header.name)) {
+                            if (header.name === 'index.html') {
+                              hasIndex = true;
+                            }
+                            var subPath = require('path').dirname(path + '/' + header.name);
+                            require('mkdirp').sync(subPath);
+                            fs.writeFileSync(path + '/' + header.name, data);
+                          }
+                        });
+                        stream.on('end', function () {
+                          next();
+                        });
+
+                        stream.resume();
+                      });
+                      extract.on('finish', function () {
+                        if (!hasIndex) {
+                          res.send({
+                              status: 500,
+                              message: 'No index.html file'
+                          });
+                        }
+                      });
+                      extract.end(fs.readFileSync(file.tempFilePath));
+
+                  } else {
+                      // assume it's an HTML file
+                      path = file.tempFilePath
+                  }
+                  const baseUrl = req.protocol + "://" + req.headers.host + '/' + BASE_URI,
+                        params = req.body ? Object.keys(req.body).map(key => key + '=' + req.body[key]).join('&') : "";
+                        src = baseUrl  + path + ('?' + params || ""),
+                        qs = {url: src, type: 'respec'};
+                  request.get({url: baseUrl, qs: qs}, (err, response, body) => {
+                      if (err) {
+                          res.status(500).send(err);
+                      } else {
+                          res.send(body);
+                          // delete temp file
+                          require("fs").promises.unlink(file.tempFilePath);
+                          require("fs").rmdirSync(path, { recursive: true });
+                      }
+                  });
+                });
             });
         }
     } catch (err) {
