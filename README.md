@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/w3c/spec-generator.svg?branch=master)](https://travis-ci.com/w3c/spec-generator)
+[![Build Status](https://travis-ci.com/w3c/spec-generator.svg?branch=main)](https://travis-ci.com/w3c/spec-generator)
 [![Greenkeeper badge](https://badges.greenkeeper.io/w3c/spec-generator.svg)](https://greenkeeper.io/)
 
 # Spec Generator
