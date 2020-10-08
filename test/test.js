@@ -11,12 +11,9 @@ const PORT = 3000,
   BAD_GENERATOR = '?type=fluxor&url=http://example.com/',
   BAD_SHORTNAME = '?type=RESPEC&url=http://example.com/%3FshortName%3Ddiplodocus',
   NO_RESPEC = '?type=RESPEC&url=http://example.com/',
-  AUTH = encodeURIComponent(
-    `?githubToken=${process.env.GH_TOKEN || ""}&githubUser=${process.env.GH_USER || ""}`
-  ),
-  SUCCESS1 = `?type=respec&url=https://w3c.github.io/manifest/${AUTH}`,
-  SUCCESS2 = `?type=respec&url=https://w3c.github.io/payment-request/${AUTH}`,
-  SUCCESS3 = `?type=respec&url=https://w3c.github.io/resource-hints/${AUTH}`;
+  SUCCESS1 = `?type=respec&url=https://w3c.github.io/manifest/`,
+  SUCCESS2 = `?type=respec&url=https://w3c.github.io/payment-request/`,
+  SUCCESS3 = `?type=respec&url=https://w3c.github.io/resource-hints/`;
 
 const FAILS_WITH = (done, expectedMessage = '{"error":"Both \'type\' and \'url\' are required."}', expectedCode = 500) =>
   (error, response, body) => {
