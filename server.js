@@ -243,18 +243,13 @@ function getPreviousVersionInfo(shortName, publishDate) {
 
 /**
  * Start listening for HTTP requests.
- *
- * @param {Number} port - port number to use (optional); defaults to environment variable `$PORT` if exists, and to `80` if not
- * @returns {Object} a `http.Server`; cf https://nodejs.org/dist/latest-v8.x/docs/api/http.html#http_class_http_server
+ * @param {number} [port] - port number to use (optional); defaults to environment variable `$PORT` if exists, and to `80` if not
  */
-app.start = (port) => {
-    if (port)
-        return app.listen(port);
-    else
-        return app.listen(process.env.PORT || 80);
+app.start = (port = parseInt(process.env.PORT) || 80) => {
+    return app.listen(port);
 };
 
-if (module === process.mainModule)
+module.exports = app;
+if (module === require.main) {
     app.start();
-else
-    module.exports = app;
+}
