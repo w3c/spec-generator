@@ -1,21 +1,24 @@
+const path = require("path");
+const { URL } = require("url");
 
-var express = require("express")
-,   { JSDOM } = require('jsdom')
-,   app = express()
-,   genMap = {
-        respec: require("./generators/respec").generate
-    }
-,   num2 = function (num) {
-        var str = num + "";
-        if (str.length >= 2) return str;
-        return "0" + str;
-    }
-,   path = require('path')
-,   request = require("request")
-,   URL = require('url').URL
-,   fileUpload = require('express-fileupload')
-,   BASE_URI = process.env.BASE_URI || ""
-;
+const express = require("express");
+const fileUpload = require("express-fileupload");
+const { JSDOM } = require("jsdom");
+const request = require("request");
+
+const genMap = {
+    respec: require("./generators/respec").generate,
+};
+
+const app = express();
+const BASE_URI = process.env.BASE_URI || "";
+
+const num2 = (num) => {
+    const str = num + "";
+    if (str.length >= 2) return str;
+    return "0" + str;
+};
+
 app.use(fileUpload({
     createParentPath: true,
     useTempFiles: true,
