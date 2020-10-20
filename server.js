@@ -235,12 +235,10 @@ function getPreviousVersionInfo(shortName, publishDate) {
             const pDate = prev.match(/[1-2][0-9]{7}/)[0];
 
             const previousMaturity = prev.match(/\/TR\/[0-9]{4}\/([A-Z]+)/)[1];
-            const previousPublishDate =
-                pDate.substring(0, 4) +
-                "-" +
-                pDate.substring(4, 6) +
-                "-" +
-                pDate.substring(6, 8);
+            const previousPublishDate = pDate.replace(
+                /(\d{4})(\d{2})(\d{2})/,
+                "$1-$2-$3",
+            );
             resolve({ previousMaturity, previousPublishDate });
         });
     });
