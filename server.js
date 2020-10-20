@@ -50,13 +50,9 @@ app.get("/", async function (req, res) {
     if (specURL.hostname === "raw.githubusercontent.com")
       return res.status(500).json({ error: "raw.githubusercontent.com URLs aren't supported. Use github pages instead."});
     var shortName = specURL.searchParams.get("shortName");
+    const publishDate =
+        specURL.searchParams.get("publishDate") || getShortIsoDate();
 
-    let publishDate;
-    if (specURL.searchParams.get("publishDate")) {
-        publishDate = specURL.searchParams.get("publishDate");
-    } else {
-        publishDate = getShortIsoDate();
-    }
     specURL.searchParams.set("publishDate", publishDate);
 
     if (shortName) {
