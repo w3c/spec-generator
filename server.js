@@ -16,11 +16,13 @@ const BASE_URI = process.env.BASE_URI || "";
 /** Get present date in YYYY-MM-DD format */
 const getShortIsoDate = () => new Date().toISOString().slice(0, 10);
 
-app.use(fileUpload({
-    createParentPath: true,
-    useTempFiles: true,
-    tempFileDir: 'uploads/'
-}));
+app.use(
+    fileUpload({
+        createParentPath: true,
+        useTempFiles: true,
+        tempFileDir: "uploads/",
+    }),
+);
 
 // Listens to GET at the root, expects two required query string parameters:
 //  type:   the type of the generator (case-insensitive)
