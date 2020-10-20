@@ -29,11 +29,23 @@ app.use(fileUpload({
 //  type:   the type of the generator (case-insensitive)
 //  url:    the URL to the source document
 app.get("/", function (req, res) {
-    var type = (req.query.type || "").toLowerCase()
-    ,   url = req.query.url ? decodeURIComponent(req.query.url) : undefined
-    ;
-    if (!url || !type) return res.status(500).json({ error: "Both 'type' and 'url' are required." });
-    if (!genMap[type]) return res.status(500).json({ error: "Unknown generator: " + type });
+    var type =
+        typeof req.query.type === "string"
+            ? req.query.type.toLowerCase()
+            : undefined;
+    var url =
+        typeof req.query.url === "string"
+            ? decodeURIComponent(req.query.url)
+            : undefined;
+    if (!url || !type) {
+        return res
+            .status(500)
+            .json({ error: "Both 'type' and 'url' are required." });
+    }
+    if (!genMap.hasOwnProperty(type)) {
+        return res.status(500).json({ error: "Unknown generator: " + type });
+    }
+
     // We look if the provided URL comes with a shortName in the query string
     var specURL = new URL(url);
     if (specURL.hostname === "raw.githubusercontent.com")
