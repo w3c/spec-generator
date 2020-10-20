@@ -45,10 +45,12 @@ app.get("/", async function (req, res) {
         return res.status(500).json({ error: "Unknown generator: " + type });
     }
 
-    // We look if the provided URL comes with a shortName in the query string
     var specURL = new URL(url);
-    if (specURL.hostname === "raw.githubusercontent.com")
-      return res.status(500).json({ error: "raw.githubusercontent.com URLs aren't supported. Use github pages instead."});
+    if (specURL.hostname === "raw.githubusercontent.com") {
+        return res.status(500).json({
+            error: `raw.githubusercontent.com URLs aren't supported. Use github pages instead.`,
+        });
+    }
     var shortName = specURL.searchParams.get("shortName");
     const publishDate =
         specURL.searchParams.get("publishDate") || getShortIsoDate();
@@ -80,12 +82,15 @@ app.get("/", async function (req, res) {
     }
 });
 
-app.use('/uploads', express.static('./uploads', {
-  setHeaders: (res, requestPath) => {
-      let noExtension = !Boolean(path.extname(requestPath));
-      if (noExtension) res.setHeader('Content-Type', 'text/html');
-    }
-}));
+app.use(
+    "/uploads",
+    express.static("./uploads", {
+        setHeaders(res, requestPath) {
+            const noExtension = !Boolean(path.extname(requestPath));
+            if (noExtension) res.setHeader("Content-Type", "text/html");
+        },
+    }),
+);
 
 app.post("/", (req, res) => {
     try {
