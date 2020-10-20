@@ -13,11 +13,8 @@ const genMap = {
 const app = express();
 const BASE_URI = process.env.BASE_URI || "";
 
-const num2 = (num) => {
-    const str = num + "";
-    if (str.length >= 2) return str;
-    return "0" + str;
-};
+/** Get present date in YYYY-MM-DD format */
+const getShortIsoDate = () => new Date().toISOString().slice(0, 10);
 
 app.use(fileUpload({
     createParentPath: true,
@@ -56,8 +53,7 @@ app.get("/", function (req, res) {
     if (specURL.searchParams.get("publishDate")) {
         publishDate = specURL.searchParams.get("publishDate");
     } else {
-        const d = new Date();
-        publishDate = [d.getFullYear(), num2(d.getMonth() + 1), num2(d.getDate())].join("-");
+        publishDate = getShortIsoDate();
     }
     specURL.searchParams.set("publishDate", publishDate);
 
