@@ -1,10 +1,14 @@
-const path = require("path");
-const { URL } = require("url");
+const { extname, dirname, resolve } = require("path");
+const { URL, URLSearchParams } = require("url");
+const { readFile, unlink, rmdir, mkdtemp, writeFile } = require("fs").promises;
 
 const express = require("express");
 const fileUpload = require("express-fileupload");
+const fileType = require("file-type");
+const tar = require("tar-stream");
 const { JSDOM } = require("jsdom");
 const request = require("request");
+const mkdirp = require("mkdirp");
 
 const genMap = {
     respec: require("./generators/respec").generate,
@@ -86,96 +90,92 @@ app.use(
     "/uploads",
     express.static("./uploads", {
         setHeaders(res, requestPath) {
-            const noExtension = !Boolean(path.extname(requestPath));
+            const noExtension = !Boolean(extname(requestPath));
             if (noExtension) res.setHeader("Content-Type", "text/html");
         },
     }),
 );
 
-app.post("/", (req, res) => {
+app.post("/", async (req, res) => {
+    if (!req.files || !req.files.file) {
+        return res.send({
+            status: 500,
+            message: "No file uploaded",
+        });
+    }
+
     try {
-        if (!req.files) {
-            res.send({
-                status: 500,
-                message: 'No file uploaded'
-            });
-        } else {
-            let file = req.files.file;
-            // file can be an html file or a tar file
-            const fileType = require('file-type');
-            const fs = require('fs');
+        const { tempFilePath } = req.files.file;
 
-            fs.readFile(file.tempFilePath, (err, content) => {
-                fileType.fromBuffer(content).then(type => {
-                  let path = ""
-                  if (type && type.mime === 'application/x-tar') {
-                      // tar file
-                      var tar = require('tar-stream');
-                      var extract = tar.extract();
-                      var hasIndex = false;
-                      path = fs.mkdtempSync('uploads/');
+        // file can be an html file or a tar file
+        const content = await readFile(tempFilePath);
+        const type = await fileType.fromBuffer(content);
+        const path =
+            type && type.mime === "application/x-tar"
+                ? await extractTar(content)
+                : // assume it's an HTML file
+                  tempFilePath;
 
-                      extract.on('entry', function (header, stream, next) {
-                        stream.on('data', function (data) {
-                          const isAllowed = function(name) {
-                              if (name.toLowerCase().indexOf('.htaccess') !== -1) return false;
-                              else if (name.toLowerCase().indexOf('.php') !== -1) return false;
-                              else if (name.indexOf('CVS') !== -1) return false;
-                              else if (name.indexOf('../') !== -1) return false;
-                              else if (name.indexOf('://') !== -1) return false;
-                              else return true;
-                          }
-
-                          if (isAllowed(header.name)) {
-                            if (header.name === 'index.html') {
-                              hasIndex = true;
-                            }
-                            var subPath = require('path').dirname(path + '/' + header.name);
-                            require('mkdirp').sync(subPath);
-                            fs.writeFileSync(path + '/' + header.name, data);
-                          }
-                        });
-                        stream.on('end', function () {
-                          next();
-                        });
-
-                        stream.resume();
-                      });
-                      extract.on('finish', function () {
-                        if (!hasIndex) {
-                          res.send({
-                              status: 500,
-                              message: 'No index.html file'
-                          });
-                        }
-                      });
-                      extract.end(fs.readFileSync(file.tempFilePath));
-
-                  } else {
-                      // assume it's an HTML file
-                      path = file.tempFilePath
-                  }
-                  const baseUrl = req.protocol + "://" + req.headers.host + '/' + BASE_URI,
-                        params = req.body ? Object.keys(req.body).map(key => key + '=' + req.body[key]).join('&') : "";
-                        src = baseUrl  + path + ('?' + params || ""),
-                        qs = {url: src, type: 'respec'};
-                  request.get({url: baseUrl, qs: qs}, (err, response, body) => {
-                      if (err) {
-                          res.status(500).send(err);
-                      } else {
-                          res.send(body);
-                          // delete temp file
-                          require("fs").promises.unlink(file.tempFilePath);
-                          require("fs").rmdirSync(path, { recursive: true });
-                      }
-                  });
-                });
-            });
-        }
+        const baseUrl = `${req.protocol}://${req.get("host")}/${BASE_URI}`;
+        const params = new URLSearchParams(req.body).toString();
+        const src = baseUrl + path + "?" + params;
+        const qs = { url: src, type: "respec" };
+        request.get({ url: baseUrl, qs: qs }, (err, _response, body) => {
+            if (err) {
+                res.status(500).send(err);
+            } else {
+                res.send(body);
+                // delete temp file
+                unlink(tempFilePath);
+                rmdir(path, { recursive: true });
+            }
+        });
     } catch (err) {
         res.status(500).send(err);
     }
 });
+
+async function extractTar(tarFile) {
+    const extract = tar.extract();
+    const uploadPath = await mkdtemp("uploads/");
+
+    return new Promise((resolve, reject) => {
+        let hasIndex = false;
+        extract.on("entry", (header, stream, next) => {
+            stream.on("data", async data => {
+                if (uploadedFileIsAllowed(header.name)) {
+                    if (!hasIndex && header.name === "index.html") {
+                        hasIndex = true;
+                    }
+                    const filePath = uploadPath + "/" + header.name;
+                    mkdirp.sync(dirname(filePath));
+                    await writeFile(filePath, data);
+                }
+            });
+            stream.on("end", () => next());
+            stream.resume();
+        });
+
+        extract.on("finish", () => {
+            if (!hasIndex) {
+                reject("No index.html file");
+            } else {
+                resolve(uploadPath);
+            }
+        });
+
+        extract.end(tarFile);
+    });
+
+    function uploadedFileIsAllowed(name) {
+        if (name.toLowerCase().includes(".htaccess")) return false;
+        if (name.toLowerCase().includes(".php")) return false;
+        if (name.includes("CVS")) return false;
+        if (name.includes("../")) return false;
+        if (name.includes("://")) return false;
+        return true;
+    }
+}
 
 /**
  * @param {string} shortName
