@@ -32,11 +32,11 @@ app.use(
 //  type:   the type of the generator (case-insensitive)
 //  url:    the URL to the source document
 app.get("/", async function (req, res) {
-    var type =
+    const type =
         typeof req.query.type === "string"
             ? req.query.type.toLowerCase()
             : undefined;
-    var url =
+    const url =
         typeof req.query.url === "string"
             ? decodeURIComponent(req.query.url)
             : undefined;
@@ -55,7 +55,7 @@ app.get("/", async function (req, res) {
             error: `raw.githubusercontent.com URLs aren't supported. Use github pages instead.`,
         });
     }
-    var shortName = specURL.searchParams.get("shortName");
+    const shortName = specURL.searchParams.get("shortName");
     const publishDate =
         specURL.searchParams.get("publishDate") || getShortIsoDate();
 
