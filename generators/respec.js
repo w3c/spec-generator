@@ -1,4 +1,4 @@
-const { fetchAndWrite: respecWriter } = require("respec/tools/respecDocWriter");
+const { toHTML } = require("respec");
 
 class SpecGeneratorError extends Error {
   constructor({ status, message }) {
@@ -8,11 +8,13 @@ class SpecGeneratorError extends Error {
 }
 
 exports.generate = async function generate(url) {
-  const opts = { timeout: 30000, disableSandbox: true };
   try {
     console.log("Generating", url);
-    const result = await respecWriter(url, "/dev/null", {}, opts);
-    return result;
+    const { html } = await toHTML(url, {
+      timeout: 30000,
+      disableSandbox: true,
+    });
+    return html;
   } catch (err) {
     throw new SpecGeneratorError({ status: 500, message: err.message });
   }
