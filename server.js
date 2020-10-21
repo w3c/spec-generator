@@ -79,8 +79,10 @@ app.get("/", async function (req, res) {
 
     // if there's an error we get an err object with status and message, otherwise we get content
     try {
-        const content = await genMap[type](specURL.href);
-        res.send(content);
+        const { html, errors, warnings } = await genMap[type](specURL.href);
+        res.setHeader("x-errors-count", errors);
+        res.setHeader("x-warnings-count", warnings);
+        res.send(html);
     } catch (err) {
         res.status(err.status).json({ error: err.message });
     }
@@ -120,10 +122,18 @@ app.post("/", async (req, res) => {
         const params = new URLSearchParams(req.body).toString();
         const src = baseUrl + path + "?" + params;
         const qs = { url: src, type: "respec" };
-        request.get({ url: baseUrl, qs: qs }, (err, _response, body) => {
+        request.get({ url: baseUrl, qs: qs }, (err, response, body) => {
             if (err) {
                 res.status(500).send(err);
             } else {
+                res.setHeader(
+                    "x-errors-count",
+                    response.headers["x-errors-count"],
+                );
+                res.setHeader(
+                    "x-warnings-count",
+                    response.headers["x-warnings-count"],
+                );
                 res.send(body);
                 // delete temp file
                 unlink(tempFilePath);
