@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spec Generator</title>
+  <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-shadow: border-box;
+    }
+
+    :root {
+        --bg-accent: #005a9c;
+        --bg-accent-alt: #08314f;
+    }
+
+    body {
+        font-family: sans-serif;
+        width: 70ch;
+        max-width: 95vw;
+        margin: 1em auto;
+    }
+
+    label {
+        line-height: 1.5;
+    }
+
+    input {
+        background: #eee;
+        border: 1px solid #ddd;
+        line-height: 1.5;
+        padding: 0.2rem;
+        margin-bottom: 0.5em;
+        width: 100%;
+    }
+
+    .either {
+        border-left: 0.5rem solid var(--bg-accent);
+        position: relative;
+    }
+
+    .either:after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 0;
+        background: var(--bg-accent);
+        height: 0.5rem;
+        width: 100%;
+        transform: translateY(-50%);
+    }
+
+    fieldset {
+        border: none;
+        padding: 1em;
+        padding-right: 0;
+    }
+
+    button {
+        display: block;
+        border: none;
+        background: var(--bg-accent);
+        color: #fff;
+        border-radius: 2px;
+        padding: 1em;
+    }
+
+    button:hover {
+        background: var(--bg-accent-alt);
+        cursor: pointer;
+    }
+
+    footer {
+        text-align: center;
+        margin: 1em;
+        margin-top: 5em;
+        border-top: 0.2rem solid;
+        padding: 0.5em;
+    }
+    </style>
+</head>
+<body>
+    <form action="">
+        <h2>Convert ReSpec document to HTML</h2>
+        <fieldset style="text-align: right;">
+            <label for="type">Generator</label>
+            <select name="type" id="type" required>
+                <option value="respec" selected>ReSpec</option>
+            </select>
+        </fieldset>
+        <div class="either">
+            <fieldset>
+                <label for="url">Spec URL (with optional query parameters)</label>
+                <input type="url" name="url" id="url" placeholder="https://w3c.github.io/manifest/?specStatus=WD&publishDate=2020-10-20">
+                <button formmethod="GET">Generate</button>
+            </fieldset>
+            <fieldset>
+                <label for="file">Or, upload a HTML or tar file</label>
+                <input type="file" name="file" id="file" accept="application/x-tar, .html">
+                <button formmethod="POST" formenctype="multipart/form-data">Upload and Generate</button>
+            </fieldset>
+        </div>
+    </form>
+    <footer>
+        <p><a href="https://github.com/w3c/spec-generator">GitHub</a></p>
+    </footer>
+</body>
+</html>

@@ -57,6 +57,11 @@ describe('spec-generator', () => {
   });
 
   describe('succeeds when it should', () => {
+    describe("renders form UI", () => {
+      it('without parameters', (done) => REQUEST.get(BASE_URL, { headers: { Accept: "text/html" } }, SUCCEEDS(done)));
+      it('if there\'s no URL', (done) => REQUEST.get(BASE_URL + NO_URL, { headers: { Accept: "text/html" } }, SUCCEEDS(done)));
+      it('if there\'s no type', (done) => REQUEST.get(BASE_URL + NO_TYPE, { headers: { Accept: "text/html" } }, SUCCEEDS(done)));
+    });
     it('Web App Manifest ("appmanifest")', (done) => REQUEST.get(BASE_URL + SUCCESS1, SUCCEEDS(done)));
     it('Payment Request API ("payment-request")', (done) => REQUEST.get(BASE_URL + SUCCESS2, SUCCEEDS(done)));
     it('Resource Hints ("resource-hints")', (done) => REQUEST.get(BASE_URL + SUCCESS3, SUCCEEDS(done)));
