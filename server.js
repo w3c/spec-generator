@@ -1,6 +1,7 @@
-const { extname, dirname, resolve } = require("path");
+const { extname, dirname } = require("path");
 const { URL, URLSearchParams } = require("url");
 const { readFile, unlink, rmdir, mkdtemp, writeFile } = require("fs").promises;
+const { readFileSync } = require("fs");
 
 const express = require("express");
 const fileUpload = require("express-fileupload");
@@ -16,6 +17,8 @@ const genMap = {
 
 const app = express();
 const BASE_URI = process.env.BASE_URI || "";
+
+const FORM_HTML = readFileSync(`${__dirname}/index.html`, "utf-8");
 
 /** Get present date in YYYY-MM-DD format */
 const getShortIsoDate = () => new Date().toISOString().slice(0, 10);
@@ -41,9 +44,13 @@ app.get("/", async function (req, res) {
             ? decodeURIComponent(req.query.url)
             : undefined;
     if (!url || !type) {
-        return res
-            .status(500)
-            .json({ error: "Both 'type' and 'url' are required." });
+        if (req.headers.accept && req.headers.accept.includes("text/html")) {
+            return res.send(FORM_HTML);
+        } else {
+            return res
+                .status(500)
+                .json({ error: "Both 'type' and 'url' are required." });
+        }
     }
     if (!genMap.hasOwnProperty(type)) {
         return res.status(500).json({ error: "Unknown generator: " + type });
