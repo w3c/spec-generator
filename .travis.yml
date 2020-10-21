@@ -2,9 +2,9 @@ language: node_js
 node_js:
   - lts/*
 script:
-  - npx respec2html -e --timeout 30 --src "https://w3c.github.io/manifest/" --out /dev/null
-  - npx respec2html -e --timeout 30 --src "https://w3c.github.io/payment-request/" --out /dev/null
-  - npx respec2html -e --timeout 30 --src "https://w3c.github.io/resource-hints/" --out /dev/null
+  - npx respec2html -e --timeout 30 --src "https://w3c.github.io/manifest/"
+  - npx respec2html -e --timeout 30 --src "https://w3c.github.io/payment-request/"
+  - npx respec2html -e --timeout 30 --src "https://w3c.github.io/resource-hints/"
   - npm test
 notifications:
   email: false
