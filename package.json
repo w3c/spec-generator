@@ -9,7 +9,7 @@
     "jsdom": "16.4.0",
     "mkdirp": "1.0",
     "request": "2.88.2",
-    "respec": "25.18.0",
+    "respec": "25.18.1",
     "tar-stream": "2.1.4"
   },
   "devDependencies": {
