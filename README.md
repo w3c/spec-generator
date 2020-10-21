@@ -52,6 +52,8 @@ If the specific generator encounters a problem a similar error (mostly likely `5
 sort of JSON message is returned. Specific generator types can extend this behaviour. The `respec`
 generator only returns `500` errors.
 
+The HTTP response status code is `200` even when there are processing errors and warnings. Processing errors and warnings are signaled with the help of `x-errors-count` and `x-warnings-count` response headers respectively instead.
+
 ## Writing generators
 
 Generators are simple to write and new ones can easily be added. Simply add a new one under
