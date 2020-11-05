@@ -13,7 +13,7 @@
     "tar-stream": "2.1.4"
   },
   "devDependencies": {
-    "mocha": "8.2.0",
+    "mocha": "8.2.1",
     "nodemon": "2.0.6"
   },
   "engines": {
