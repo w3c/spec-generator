@@ -4,7 +4,7 @@
   "license": "MIT",
   "dependencies": {
     "express": "4.17.1",
-    "express-fileupload": "1.2.0",
+    "express-fileupload": "1.2.1",
     "file-type": "16.2.0",
     "jsdom": "16.4.0",
     "mkdirp": "1.0",
@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "mocha": "8.2.1",
-    "nodemon": "2.0.6"
+    "nodemon": "2.0.7"
   },
   "engines": {
     "node": "10 || 12 || 14",
