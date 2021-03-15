@@ -1,3 +1,5 @@
+"use strict";
+
 const { extname, dirname } = require("path");
 const { URL, URLSearchParams } = require("url");
 const { readFile, unlink, rmdir, mkdtemp, writeFile } = require("fs").promises;
@@ -11,8 +13,9 @@ const { JSDOM } = require("jsdom");
 const request = require("request");
 const mkdirp = require("mkdirp");
 
+const respec = require("./generators/respec").generate;
 const genMap = {
-    respec: require("./generators/respec").generate,
+    respec,
 };
 
 const app = express();
@@ -31,6 +34,120 @@ app.use(
     }),
 );
 
+/**
+ * @param {string} shortName
+ * @param {string} publishDate
+ * @returns {Promise<{ previousMaturity: string, previousPublishDate: string }>}
+ * @throws {Promise<{ statusCode: number, error: string }>}
+ */
+function getPreviousVersionInfo(shortName, publishDate) {
+    return new Promise((resolve, reject) => {
+        const url = "https://www.w3.org/TR/" + shortName + "/";
+        request.get(url, (error, response, body) => {
+            if (error) {
+                // eslint-disable-next-line prefer-promise-reject-errors
+                return reject({ statusCode: 400, error });
+            }
+
+            if (
+                response &&
+                response.statusCode >= 400 &&
+                response.statusCode < 500
+            ) {
+                const { statusCode, statusMessage } = response;
+                // eslint-disable-next-line prefer-promise-reject-errors
+                return reject({ statusCode, error: statusMessage });
+            }
+
+            const document = new JSDOM(body).window.document;
+            const dl = document.querySelector("body div.head dl");
+
+            let thisURI;
+            let previousURI;
+            if (dl) {
+                // eslint-disable-next-line no-restricted-syntax
+                for (const dt of dl.querySelectorAll("dt")) {
+                    const txt = dt.textContent
+                        .toLocaleLowerCase()
+                        .replace(":", "")
+                        .replace("published", "")
+                        .trim();
+                    const dd = dt.nextElementSibling;
+                    if (txt === "this version") {
+                        thisURI = dd.querySelector("a").href;
+                    } else if (/^previous version(?:s)?$/.test(txt)) {
+                        previousURI = dd.querySelector("a").href;
+                    }
+                }
+            }
+            if (!thisURI) {
+                // eslint-disable-next-line prefer-promise-reject-errors
+                return reject({
+                    statusCode: 5000,
+                    error: `Couldn't find a 'This version' uri in the previous version.`,
+                });
+            }
+
+            const thisDate = thisURI.match(/[1-2][0-9]{7}/)[0];
+            const prev =
+                thisDate === publishDate.replace(/-/g, "")
+                    ? previousURI
+                    : thisURI;
+            const pDate = prev.match(/[1-2][0-9]{7}/)[0];
+
+            const previousMaturity = prev.match(/\/TR\/[0-9]{4}\/([A-Z]+)/)[1];
+            const previousPublishDate = pDate.replace(
+                /(\d{4})(\d{2})(\d{2})/,
+                "$1-$2-$3",
+            );
+            resolve({ previousMaturity, previousPublishDate });
+        });
+    });
+}
+
+async function extractTar(tarFile) {
+    const extract = tar.extract();
+    const uploadPath = await mkdtemp("uploads/");
+
+    function uploadedFileIsAllowed(name) {
+        if (name.toLowerCase().includes(".htaccess")) return false;
+        if (name.toLowerCase().includes(".php")) return false;
+        if (name.includes("CVS")) return false;
+        if (name.includes("../")) return false;
+        if (name.includes("://")) return false;
+        return true;
+    }
+
+    return new Promise((resolve, reject) => {
+        let hasIndex = false;
+        extract.on("entry", (header, stream, next) => {
+            stream.on("data", async data => {
+                if (uploadedFileIsAllowed(header.name)) {
+                    if (!hasIndex && header.name === "index.html") {
+                        hasIndex = true;
+                    }
+                    const filePath = uploadPath + "/" + header.name;
+                    mkdirp.sync(dirname(filePath));
+                    await writeFile(filePath, data);
+                }
+            });
+            stream.on("end", () => next());
+            stream.resume();
+        });
+
+        extract.on("finish", () => {
+            if (!hasIndex) {
+                // eslint-disable-next-line prefer-promise-reject-errors
+                reject("No index.html file");
+            } else {
+                resolve(uploadPath);
+            }
+        });
+
+        extract.end(tarFile);
+    });
+}
+
 // Listens to GET at the root, expects two required query string parameters:
 //  type:   the type of the generator (case-insensitive)
 //  url:    the URL to the source document
@@ -46,12 +163,12 @@ app.get("/", async function (req, res) {
     if (!url || !type) {
         if (req.headers.accept && req.headers.accept.includes("text/html")) {
             return res.send(FORM_HTML);
-        } else {
-            return res
-                .status(500)
-                .json({ error: "Both 'type' and 'url' are required." });
         }
+        return res
+            .status(500)
+            .json({ error: "Both 'type' and 'url' are required." });
     }
+    // eslint-disable-next-line no-prototype-builtins
     if (!genMap.hasOwnProperty(type)) {
         return res.status(500).json({ error: "Unknown generator: " + type });
     }
@@ -99,7 +216,7 @@ app.use(
     "/uploads",
     express.static("./uploads", {
         setHeaders(res, requestPath) {
-            const noExtension = !Boolean(extname(requestPath));
+            const noExtension = !extname(requestPath);
             if (noExtension) res.setHeader("Content-Type", "text/html");
         },
     }),
@@ -152,120 +269,11 @@ app.post("/", async (req, res) => {
     }
 });
 
-async function extractTar(tarFile) {
-    const extract = tar.extract();
-    const uploadPath = await mkdtemp("uploads/");
-
-    return new Promise((resolve, reject) => {
-        let hasIndex = false;
-        extract.on("entry", (header, stream, next) => {
-            stream.on("data", async data => {
-                if (uploadedFileIsAllowed(header.name)) {
-                    if (!hasIndex && header.name === "index.html") {
-                        hasIndex = true;
-                    }
-                    const filePath = uploadPath + "/" + header.name;
-                    mkdirp.sync(dirname(filePath));
-                    await writeFile(filePath, data);
-                }
-            });
-            stream.on("end", () => next());
-            stream.resume();
-        });
-
-        extract.on("finish", () => {
-            if (!hasIndex) {
-                reject("No index.html file");
-            } else {
-                resolve(uploadPath);
-            }
-        });
-
-        extract.end(tarFile);
-    });
-
-    function uploadedFileIsAllowed(name) {
-        if (name.toLowerCase().includes(".htaccess")) return false;
-        if (name.toLowerCase().includes(".php")) return false;
-        if (name.includes("CVS")) return false;
-        if (name.includes("../")) return false;
-        if (name.includes("://")) return false;
-        return true;
-    }
-}
-
-/**
- * @param {string} shortName
- * @param {string} publishDate
- * @returns {Promise<{ previousMaturity: string, previousPublishDate: string }>}
- * @throws {Promise<{ statusCode: number, error: string }>}
- */
-function getPreviousVersionInfo(shortName, publishDate) {
-    return new Promise((resolve, reject) => {
-        const url = "https://www.w3.org/TR/" + shortName + "/";
-        request.get(url, (error, response, body) => {
-            if (error) {
-                return reject({ statusCode: 400, error });
-            }
-
-            if (
-                response &&
-                response.statusCode >= 400 &&
-                response.statusCode < 500
-            ) {
-                const { statusCode, statusMessage } = response;
-                return reject({ statusCode, error: statusMessage });
-            }
-
-            const document = new JSDOM(body).window.document;
-            const dl = document.querySelector("body div.head dl");
-
-            let thisURI;
-            let previousURI;
-            if (dl) {
-                for (const dt of dl.querySelectorAll("dt")) {
-                    const txt = dt.textContent
-                        .toLocaleLowerCase()
-                        .replace(":", "")
-                        .replace("published", "")
-                        .trim();
-                    const dd = dt.nextElementSibling;
-                    if (txt === "this version") {
-                        thisURI = dd.querySelector("a").href;
-                    } else if (/^previous version(?:s)?$/.test(txt)) {
-                        previousURI = dd.querySelector("a").href;
-                    }
-                }
-            }
-            if (!thisURI) {
-                return reject({
-                    statusCode: 5000,
-                    error: `Couldn't find a 'This version' uri in the previous version.`,
-                });
-            }
-
-            const thisDate = thisURI.match(/[1-2][0-9]{7}/)[0];
-            const prev =
-                thisDate === publishDate.replace(/\-/g, "")
-                    ? previousURI
-                    : thisURI;
-            const pDate = prev.match(/[1-2][0-9]{7}/)[0];
-
-            const previousMaturity = prev.match(/\/TR\/[0-9]{4}\/([A-Z]+)/)[1];
-            const previousPublishDate = pDate.replace(
-                /(\d{4})(\d{2})(\d{2})/,
-                "$1-$2-$3",
-            );
-            resolve({ previousMaturity, previousPublishDate });
-        });
-    });
-}
-
 /**
  * Start listening for HTTP requests.
  * @param {number} [port] - port number to use (optional); defaults to environment variable `$PORT` if exists, and to `80` if not
  */
-app.start = (port = parseInt(process.env.PORT) || 80) => {
+app.start = (port = parseInt(process.env.PORT, 10) || 80) => {
     return app.listen(port);
 };
 
