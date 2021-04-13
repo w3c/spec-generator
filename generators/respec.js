@@ -1,5 +1,3 @@
-"use strict";
-
 const { toHTML } = require("respec");
 
 class SpecGeneratorError extends Error {

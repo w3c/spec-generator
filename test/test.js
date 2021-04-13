@@ -1,5 +1,3 @@
-"use strict";
-
 const ASSERT = require("assert");
 const REQUEST = require("request");
 const SPEC_GEN = require("../server");

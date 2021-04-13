@@ -1,5 +1,3 @@
-"use strict";
-
 const { extname, dirname } = require("path");
 const { URL, URLSearchParams } = require("url");
 const { readFile, unlink, rmdir, mkdtemp, writeFile } = require("fs").promises;
@@ -14,6 +12,7 @@ const request = require("request");
 const mkdirp = require("mkdirp");
 
 const respec = require("./generators/respec").generate;
+
 const genMap = {
     respec,
 };
@@ -42,7 +41,7 @@ app.use(
  */
 function getPreviousVersionInfo(shortName, publishDate) {
     return new Promise((resolve, reject) => {
-        const url = "https://www.w3.org/TR/" + shortName + "/";
+        const url = `https://www.w3.org/TR/${shortName}/`;
         request.get(url, (error, response, body) => {
             if (error) {
                 // eslint-disable-next-line prefer-promise-reject-errors
@@ -59,7 +58,7 @@ function getPreviousVersionInfo(shortName, publishDate) {
                 return reject({ statusCode, error: statusMessage });
             }
 
-            const document = new JSDOM(body).window.document;
+            const { document } = new JSDOM(body).window;
             const dl = document.querySelector("body div.head dl");
 
             let thisURI;
@@ -126,7 +125,7 @@ async function extractTar(tarFile) {
                     if (!hasIndex && header.name === "index.html") {
                         hasIndex = true;
                     }
-                    const filePath = uploadPath + "/" + header.name;
+                    const filePath = `${uploadPath}/${header.name}`;
                     mkdirp.sync(dirname(filePath));
                     await writeFile(filePath, data);
                 }
@@ -151,7 +150,7 @@ async function extractTar(tarFile) {
 // Listens to GET at the root, expects two required query string parameters:
 //  type:   the type of the generator (case-insensitive)
 //  url:    the URL to the source document
-app.get("/", async function (req, res) {
+app.get("/", async (req, res) => {
     const type =
         typeof req.query.type === "string"
             ? req.query.type.toLowerCase()
@@ -170,10 +169,10 @@ app.get("/", async function (req, res) {
     }
     // eslint-disable-next-line no-prototype-builtins
     if (!genMap.hasOwnProperty(type)) {
-        return res.status(500).json({ error: "Unknown generator: " + type });
+        return res.status(500).json({ error: `Unknown generator: ${type}` });
     }
 
-    var specURL = new URL(url);
+    const specURL = new URL(url);
     if (specURL.hostname === "raw.githubusercontent.com") {
         return res.status(500).json({
             error: `raw.githubusercontent.com URLs aren't supported. Use github pages instead.`,
@@ -244,9 +243,9 @@ app.post("/", async (req, res) => {
 
         const baseUrl = `${req.protocol}://${req.get("host")}/${BASE_URI}`;
         const params = new URLSearchParams(req.body).toString();
-        const src = baseUrl + path + "?" + params;
+        const src = `${baseUrl + path}?${params}`;
         const qs = { url: src, type: "respec" };
-        request.get({ url: baseUrl, qs: qs }, (err, response, body) => {
+        request.get({ url: baseUrl, qs }, (err, response, body) => {
             if (err) {
                 res.status(500).send(err);
             } else {
@@ -273,9 +272,7 @@ app.post("/", async (req, res) => {
  * Start listening for HTTP requests.
  * @param {number} [port] - port number to use (optional); defaults to environment variable `$PORT` if exists, and to `80` if not
  */
-app.start = (port = parseInt(process.env.PORT, 10) || 80) => {
-    return app.listen(port);
-};
+app.start = (port = parseInt(process.env.PORT, 10) || 80) => app.listen(port);
 
 module.exports = app;
 if (module === require.main) {
