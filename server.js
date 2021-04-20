@@ -243,7 +243,7 @@ app.post("/", async (req, res) => {
 
         const baseUrl = `${req.protocol}://${req.get("host")}/${BASE_URI}`;
         const params = new URLSearchParams(req.body).toString();
-        const src = `${baseUrl + path}?${params}`;
+        const src = `${baseUrl}${path}?${params}`;
         const qs = { url: src, type: "respec" };
         request.get({ url: baseUrl, qs }, (err, response, body) => {
             if (err) {
