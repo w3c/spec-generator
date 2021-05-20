@@ -14,18 +14,20 @@ const SUCCESS1 = `?type=respec&url=https://w3c.github.io/manifest/`;
 const SUCCESS2 = `?type=respec&url=https://w3c.github.io/payment-request/`;
 const SUCCESS3 = `?type=respec&url=https://w3c.github.io/resource-hints/`;
 
-const FAILS_WITH = (
-    done,
-    expectedMessage = "{\"error\":\"Both 'type' and 'url' are required.\"}",
-    expectedCode = 500,
-) => (error, response, body) => {
-    ASSERT.equal(error, null);
-    ASSERT.equal(response.statusCode, expectedCode);
-    if (expectedMessage instanceof RegExp)
-        ASSERT.ok(body.match(expectedMessage));
-    else ASSERT.equal(body, expectedMessage);
-    done();
-};
+const FAILS_WITH =
+    (
+        done,
+        expectedMessage = "{\"error\":\"Both 'type' and 'url' are required.\"}",
+        expectedCode = 500,
+    ) =>
+    (error, response, body) => {
+        ASSERT.equal(error, null);
+        ASSERT.equal(response.statusCode, expectedCode);
+        if (expectedMessage instanceof RegExp)
+            ASSERT.ok(body.match(expectedMessage));
+        else ASSERT.equal(body, expectedMessage);
+        done();
+    };
 const SUCCEEDS = done => (error, response) => {
     ASSERT.equal(error, null);
     ASSERT.equal(response.statusCode, 200);

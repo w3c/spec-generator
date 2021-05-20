@@ -186,10 +186,8 @@ app.get("/", async (req, res) => {
 
     if (shortName) {
         try {
-            const {
-                previousMaturity,
-                previousPublishDate,
-            } = await getPreviousVersionInfo(shortName, publishDate);
+            const { previousMaturity, previousPublishDate } =
+                await getPreviousVersionInfo(shortName, publishDate);
             specURL.searchParams.set("previousMaturity", previousMaturity);
             specURL.searchParams.set(
                 "previousPublishDate",
