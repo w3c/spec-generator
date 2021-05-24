@@ -13,7 +13,7 @@
     "tar-stream": "2.2.0"
   },
   "devDependencies": {
-    "eslint": "7.26.0",
+    "eslint": "7.27.0",
     "eslint-config-airbnb-base": "14.2.1",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-html": "6.1.2",
