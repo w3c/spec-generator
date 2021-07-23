@@ -1,18 +1,35 @@
-}```"---"```'{-> 
+base.java/BigGuy573-main.prettierrc.java 
+'@'
+master-w3c-spec-generator 
+'@' '.prettierrc' '@' '#0.01' 
+ prettierrc.java 
+ '@'
+ +1,18{->
+'->}'```"---"```'{-> 
 '->}'#'{->
  '->}'#$
   '->}'##
-   '->}'##${'#'->}```"---"```->{
-   '```}'```"---"```'#'singleQuote: exception"```---```{
-  '}'->}''#$"("exception-"```---```"singleQuote-exception={->
+   '->}'##$'{'#'->}
+   ```"---"```
+   ->{'```}
+   '```"---"```'#'
+   singleQuote: 
+   exception
+   "```---```{
+  '}'->{''#$"("
+   exception-"```---```
+  "singleQuote-exception={->
   '}->']```---```->{
-  '}'##[example=next-two-lines'
-  '('
-  #
-  '#){->
-  '->}'##$(singleQuote='{->
+  '}'
+  ##[example=next-two-lines'
+  '('#''#)
+  #'{'${->
+  '##$->}'##$(singleQuote='##$'=#0{->
   ->}''###$=cmdtrue'
-  }'###"trailingComma": breaks@""/  
- }
-{
-'####$'}
+  }'##'=#"trailingComma" : will '#break
+              '@//'/'#' 
+              '@/@//#}->
+              }
+              #//#
+'####$//'//#
+              }
