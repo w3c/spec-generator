@@ -3,6 +3,7 @@
     "plugins": ["prettier"],
     "rules": {
         "prettier/prettier": "error",
+        "consistent-return":"off",
         "func-names": "off",
         "vars-on-top": "off"
     },
