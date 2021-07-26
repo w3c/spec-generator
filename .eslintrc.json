@@ -5,7 +5,7 @@
         "prettier/prettier": "error",
         "func-names": "off",
         "vars-on-top": "off",
-        "consistent-return": "off"        
+        "consistent-return": "off"
     },
     "overrides": [
         {
