@@ -4,8 +4,8 @@
     "rules": {
         "prettier/prettier": "error",
         "func-names": "off",
-        "consistent-return": "off",
-        "vars-on-top": "off"
+        "vars-on-top": "off",
+        "consistent-return": "off"        
     },
     "overrides": [
         {
