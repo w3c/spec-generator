@@ -6,7 +6,7 @@
     "express": "4.17.1",
     "express-fileupload": "1.2.1",
     "file-type": "16.5.2",
-    "jsdom": "16.6.0",
+    "jsdom": "16.7.0",
     "mkdirp": "1.0",
     "request": "2.88.2",
     "respec": "26.9.4",
