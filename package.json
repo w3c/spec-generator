@@ -19,7 +19,7 @@
     "eslint-plugin-html": "6.1.2",
     "eslint-plugin-import": "2.24.0",
     "eslint-plugin-node": "11.1.0",
-    "eslint-plugin-prettier": "3.4.0",
+    "eslint-plugin-prettier": "3.4.1",
     "husky": "^7.0.0",
     "mocha": "9.1.0",
     "nodemon": "2.0.12",
