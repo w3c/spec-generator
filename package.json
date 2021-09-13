@@ -23,7 +23,7 @@
     "husky": "^7.0.0",
     "mocha": "9.1.1",
     "nodemon": "2.0.12",
-    "prettier": "2.3.2"
+    "prettier": "2.4.0"
   },
   "engines": {
     "node": "14 || 16",
