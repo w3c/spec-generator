@@ -1,6 +1,7 @@
-const ASSERT = require("assert");
-const REQUEST = require("request");
-const SPEC_GEN = require("../server");
+import ASSERT from "assert";
+import REQUEST from "request";
+// eslint-disable-next-line import/named, import/extensions
+import app, { server } from "../server.js";
 
 const PORT = 3000;
 const BASE_URL = "http://localhost:3000/";
@@ -34,11 +35,12 @@ const SUCCEEDS = done => (error, response) => {
     ASSERT.equal(response.statusMessage, "OK");
     done();
 };
-let server;
+let testserver;
 
 describe("spec-generator", () => {
     before(() => {
-        server = SPEC_GEN.start(PORT);
+        server.close();
+        testserver = app.start(PORT);
     });
 
     describe("fails when it should", () => {
@@ -97,5 +99,5 @@ describe("spec-generator", () => {
             REQUEST.get(BASE_URL + SUCCESS3, SUCCEEDS(done)));
     });
 
-    after(() => server.close());
+    after(() => testserver.close());
 });

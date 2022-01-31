@@ -1,4 +1,4 @@
-const { toHTML } = require("respec");
+import { toHTML } from "respec";
 
 class SpecGeneratorError extends Error {
     constructor({ status, message }) {
@@ -7,7 +7,8 @@ class SpecGeneratorError extends Error {
     }
 }
 
-exports.generate = async function generate(url) {
+// eslint-disable-next-line import/prefer-default-export
+export async function generate(url) {
     try {
         // eslint-disable-next-line no-console
         console.log("Generating", url);
@@ -19,4 +20,4 @@ exports.generate = async function generate(url) {
     } catch (err) {
         throw new SpecGeneratorError({ status: 500, message: err.message });
     }
-};
+}
