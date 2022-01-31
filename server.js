@@ -271,7 +271,7 @@ app.post("/", async (req, res) => {
  * Start listening for HTTP requests.
  * @param {number} [port] - port number to use (optional); defaults to environment variable `$PORT` if exists, and to `80` if not
  */
-app.start = (port = parseInt(process.env.PORT, 10) || 80) => app.listen(port);
+app.start = (port = parseInt(process.env.PORT, 10) || 8000) => app.listen(port);
 
 const server = app.start();
 export default app;
