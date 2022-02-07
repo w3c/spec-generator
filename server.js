@@ -1,26 +1,27 @@
-const { extname, dirname } = require("path");
-const { URL, URLSearchParams } = require("url");
-const { readFile, unlink, rmdir, mkdtemp, writeFile } = require("fs").promises;
-const { readFileSync } = require("fs");
+import { extname, dirname } from "path";
+import { URL, URLSearchParams } from "url";
+import { readFile, unlink, rmdir, mkdtemp, writeFile } from "fs/promises";
+import { readFileSync } from "fs";
 
-const express = require("express");
-const fileUpload = require("express-fileupload");
-const fileType = require("file-type");
-const tar = require("tar-stream");
-const { JSDOM } = require("jsdom");
-const request = require("request");
-const mkdirp = require("mkdirp");
+import express from "express";
+import fileUpload from "express-fileupload";
+import { fileTypeFromBuffer } from "file-type";
+import tar from "tar-stream";
+import { JSDOM } from "jsdom";
+import request from "request";
+import mkdirp from "mkdirp";
 
-const respec = require("./generators/respec").generate;
+// eslint-disable-next-line import/extensions
+import { generate } from "./generators/respec.js";
 
 const genMap = {
-    respec,
+    respec: generate,
 };
 
 const app = express();
 const BASE_URI = process.env.BASE_URI || "";
 
-const FORM_HTML = readFileSync(`${__dirname}/index.html`, "utf-8");
+const FORM_HTML = readFileSync("index.html", "utf-8");
 
 /** Get present date in YYYY-MM-DD format */
 const getShortIsoDate = () => new Date().toISOString().slice(0, 10);
@@ -232,7 +233,7 @@ app.post("/", async (req, res) => {
 
         // file can be an html file or a tar file
         const content = await readFile(tempFilePath);
-        const type = await fileType.fromBuffer(content);
+        const type = await fileTypeFromBuffer(content);
         const path =
             type && type.mime === "application/x-tar"
                 ? await extractTar(content)
@@ -270,9 +271,8 @@ app.post("/", async (req, res) => {
  * Start listening for HTTP requests.
  * @param {number} [port] - port number to use (optional); defaults to environment variable `$PORT` if exists, and to `80` if not
  */
-app.start = (port = parseInt(process.env.PORT, 10) || 80) => app.listen(port);
+app.start = (port = parseInt(process.env.PORT, 10) || 8000) => app.listen(port);
 
-module.exports = app;
-if (module === require.main) {
-    app.start();
-}
+const server = app.start();
+export default app;
+export { server };
