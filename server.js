@@ -1,7 +1,7 @@
 import { extname, dirname } from "path";
 import { URL, URLSearchParams } from "url";
 import { readFile, unlink, rmdir, mkdtemp, writeFile } from "fs/promises";
-import { readFileSync } from "fs";
+import { readFileSync, createWriteStream } from "fs";
 
 import express from "express";
 import fileUpload from "express-fileupload";
@@ -151,64 +151,94 @@ async function extractTar(tarFile) {
 // Listens to GET at the root, expects two required query string parameters:
 //  type:   the type of the generator (case-insensitive)
 //  url:    the URL to the source document
-app.get("/", async (req, res) => {
-    const type =
-        typeof req.query.type === "string"
-            ? req.query.type.toLowerCase()
-            : undefined;
-    const url =
-        typeof req.query.url === "string"
-            ? decodeURIComponent(req.query.url)
-            : undefined;
-    if (!url || !type) {
-        if (req.headers.accept && req.headers.accept.includes("text/html")) {
-            return res.send(FORM_HTML);
+app.get(
+    "/",
+    async (req, res, next) => {
+        const type =
+            typeof req.query.type === "string"
+                ? req.query.type.toLowerCase()
+                : undefined;
+        const url =
+            typeof req.query.url === "string"
+                ? decodeURIComponent(req.query.url)
+                : undefined;
+        if (!url || !type) {
+            if (
+                req.headers.accept &&
+                req.headers.accept.includes("text/html")
+            ) {
+                return res.send(FORM_HTML);
+            }
+            return res
+                .status(500)
+                .json({ error: "Both 'type' and 'url' are required." });
         }
-        return res
-            .status(500)
-            .json({ error: "Both 'type' and 'url' are required." });
-    }
-    // eslint-disable-next-line no-prototype-builtins
-    if (!genMap.hasOwnProperty(type)) {
-        return res.status(500).json({ error: `Unknown generator: ${type}` });
-    }
+        // eslint-disable-next-line no-prototype-builtins
+        if (!genMap.hasOwnProperty(req.query.type)) {
+            return res
+                .status(500)
+                .json({ error: `Unknown generator: ${req.query.type}` });
+        }
+        const specURL = new URL(req.query.url);
+        if (specURL.hostname === "raw.githubusercontent.com") {
+            const uploadPath = await mkdtemp("uploads/");
+            const filePath = `${uploadPath}/index.html`;
+            const stream = createWriteStream(filePath);
+            return request
+                .get({ url: specURL })
+                .pipe(stream)
+                .on("close", () => {
+                    stream.close();
+                    const baseUrl = `${req.protocol}://${req.get(
+                        "host",
+                    )}/${BASE_URI}`;
+                    req.query.url = `${baseUrl}${filePath}${specURL.search}`;
+                    req.tmpDir = uploadPath;
+                    next();
+                });
+            // eslint-disable-next-line no-else-return
+        } else {
+            next();
+        }
+    },
+    async (req, res) => {
+        const specURL = new URL(req.query.url);
+        const shortName = specURL.searchParams.get("shortName");
+        const publishDate =
+            specURL.searchParams.get("publishDate") || getShortIsoDate();
 
-    const specURL = new URL(url);
-    if (specURL.hostname === "raw.githubusercontent.com") {
-        return res.status(500).json({
-            error: `raw.githubusercontent.com URLs aren't supported. Use github pages instead.`,
-        });
-    }
-    const shortName = specURL.searchParams.get("shortName");
-    const publishDate =
-        specURL.searchParams.get("publishDate") || getShortIsoDate();
+        specURL.searchParams.set("publishDate", publishDate);
 
-    specURL.searchParams.set("publishDate", publishDate);
+        if (shortName) {
+            try {
+                const { previousMaturity, previousPublishDate } =
+                    await getPreviousVersionInfo(shortName, publishDate);
+                specURL.searchParams.set("previousMaturity", previousMaturity);
+                specURL.searchParams.set(
+                    "previousPublishDate",
+                    previousPublishDate,
+                );
+            } catch ({ statusCode, error }) {
+                return res.status(statusCode).json({ error });
+            }
+        }
 
-    if (shortName) {
+        // if there's an error we get an err object with status and message, otherwise we get content
         try {
-            const { previousMaturity, previousPublishDate } =
-                await getPreviousVersionInfo(shortName, publishDate);
-            specURL.searchParams.set("previousMaturity", previousMaturity);
-            specURL.searchParams.set(
-                "previousPublishDate",
-                previousPublishDate,
+            const { html, errors, warnings } = await genMap[req.query.type](
+                specURL.href,
             );
-        } catch ({ statusCode, error }) {
-            return res.status(statusCode).json({ error });
+            res.setHeader("x-errors-count", errors);
+            res.setHeader("x-warnings-count", warnings);
+            res.send(html);
+        } catch (err) {
+            res.status(err.status).json({ error: err.message });
         }
-    }
-
-    // if there's an error we get an err object with status and message, otherwise we get content
-    try {
-        const { html, errors, warnings } = await genMap[type](specURL.href);
-        res.setHeader("x-errors-count", errors);
-        res.setHeader("x-warnings-count", warnings);
-        res.send(html);
-    } catch (err) {
-        res.status(err.status).json({ error: err.message });
-    }
-});
+        if (req.tmpDir) {
+            rmdir(req.tmpDir, { recursive: true });
+        }
+    },
+);
 
 app.use(
     "/uploads",
