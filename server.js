@@ -1,7 +1,7 @@
 import { extname, dirname } from "path";
 import { URL, URLSearchParams } from "url";
 import { readFile, unlink, rmdir, mkdtemp, writeFile } from "fs/promises";
-import { readFileSync, createWriteStream } from "fs";
+import { readFileSync } from "fs";
 
 import express from "express";
 import fileUpload from "express-fileupload";
@@ -10,6 +10,8 @@ import tar from "tar-stream";
 import { JSDOM } from "jsdom";
 import request from "request";
 import mkdirp from "mkdirp";
+// eslint-disable-next-line node/no-missing-import
+import scrape from "website-scraper";
 
 // eslint-disable-next-line import/extensions
 import { generate } from "./generators/respec.js";
@@ -182,24 +184,16 @@ app.get(
         const specURL = new URL(req.query.url);
         if (specURL.hostname === "raw.githubusercontent.com") {
             const uploadPath = await mkdtemp("uploads/");
-            const filePath = `${uploadPath}/index.html`;
-            const stream = createWriteStream(filePath);
-            return request
-                .get({ url: specURL })
-                .pipe(stream)
-                .on("close", () => {
-                    stream.close();
-                    const baseUrl = `${req.protocol}://${req.get(
-                        "host",
-                    )}/${BASE_URI}`;
-                    req.query.url = `${baseUrl}${filePath}${specURL.search}`;
-                    req.tmpDir = uploadPath;
-                    next();
-                });
-            // eslint-disable-next-line no-else-return
-        } else {
-            next();
+            const options = {
+                urls: [req.query.url],
+                directory: `${uploadPath}/tmp/`,
+            };
+            await scrape(options);
+            const baseUrl = `${req.protocol}://${req.get("host")}/${BASE_URI}`;
+            req.query.url = `${baseUrl}${uploadPath}/tmp/${specURL.search}`;
+            req.tmpDir = uploadPath;
         }
+        next();
     },
     async (req, res) => {
         const specURL = new URL(req.query.url);
