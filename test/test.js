@@ -9,8 +9,8 @@ const NO_URL = "?type=foo&URL=notice-that-its-in-uppercase";
 const NO_TYPE = "?url=foo&TYPE=notice-that-its-in-uppercase";
 const BAD_GENERATOR = "?type=fluxor&url=http://example.com/";
 const BAD_SHORTNAME =
-    "?type=RESPEC&url=http://example.com/%3FshortName%3Ddiplodocus";
-const NO_RESPEC = "?type=RESPEC&url=http://example.com/";
+    "?type=respec&url=http://example.com/%3FshortName%3Ddiplodocus";
+const NO_RESPEC = "?type=respec&url=http://example.com/";
 const SUCCESS1 = `?type=respec&url=https://w3c.github.io/manifest/`;
 const SUCCESS2 = `?type=respec&url=https://w3c.github.io/payment-request/`;
 const SUCCESS3 = `?type=respec&url=https://w3c.github.io/resource-hints/`;
