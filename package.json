@@ -10,7 +10,7 @@
     "jsdom": "19.0.0",
     "mkdirp": "1.0",
     "request": "2.88.2",
-    "respec": "30.0.4",
+    "respec": "31.0.4",
     "tar-stream": "2.2.0",
     "website-scraper": "5.0.0"
   },
