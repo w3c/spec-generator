@@ -1,7 +1,7 @@
 import { extname, dirname } from "path";
 import { URL, URLSearchParams } from "url";
-import { readFile, unlink, rmdir, mkdtemp, writeFile } from "fs/promises";
-import { readFileSync } from "fs";
+import { readFile, unlink, rm, mkdtemp, writeFile } from "fs/promises";
+import { readFileSync, mkdirSync, createWriteStream } from "fs";
 
 import express from "express";
 import fileUpload from "express-fileupload";
@@ -10,8 +10,7 @@ import tar from "tar-stream";
 import { JSDOM } from "jsdom";
 import request from "request";
 import mkdirp from "mkdirp";
-// eslint-disable-next-line node/no-missing-import
-import scrape from "website-scraper";
+import fetch from "node-fetch";
 
 // eslint-disable-next-line import/extensions
 import { generate } from "./generators/respec.js";
@@ -184,13 +183,36 @@ app.get(
         const specURL = new URL(req.query.url);
         if (specURL.hostname === "raw.githubusercontent.com") {
             const uploadPath = await mkdtemp("uploads/");
-            const options = {
-                urls: [req.query.url],
-                directory: `${uploadPath}/tmp/`,
-            };
-            await scrape(options);
+            const originalDocument = await fetch(req.query.url);
+            const basePath = dirname(req.query.url);
+            const jsdom = new JSDOM(await originalDocument.text());
+            const refs =
+                jsdom.window.document.querySelectorAll("[href], [src]");
+            const links = [];
+            refs.forEach(ref => {
+                const u = (ref.href || ref.src)
+                    .replace("about:blank", "")
+                    .replace(/#.+/, "");
+                links.push(new URL(u, req.query.url));
+            });
+            const relativeLinks = [...new Set(links.map(l => l.href))].filter(
+                u => u.startsWith(basePath),
+            );
+
+            relativeLinks.forEach(async l => {
+                const name =
+                    l === req.query.url
+                        ? "index.html"
+                        : l.replace(basePath, "");
+                mkdirSync(`${uploadPath}/${dirname(name)}`, {
+                    recursive: true,
+                });
+                const response = await fetch(l);
+                response.body.pipe(createWriteStream(`${uploadPath}/${name}`));
+            });
+
             const baseUrl = `${req.protocol}://${req.get("host")}/${BASE_URI}`;
-            req.query.url = `${baseUrl}${uploadPath}/tmp/${specURL.search}`;
+            req.query.url = `${baseUrl}${uploadPath}${specURL.search}`;
             req.tmpDir = uploadPath;
         }
         next();
@@ -229,7 +251,7 @@ app.get(
             res.status(err.status).json({ error: err.message });
         }
         if (req.tmpDir) {
-            rmdir(req.tmpDir, { recursive: true });
+            rm(req.tmpDir, { recursive: true });
         }
     },
 );
@@ -283,7 +305,7 @@ app.post("/", async (req, res) => {
                 res.send(body);
                 // delete temp file
                 unlink(tempFilePath);
-                rmdir(path, { recursive: true });
+                rm(path, { recursive: true });
             }
         });
     } catch (err) {
