@@ -198,17 +198,20 @@ app.get(
             const relativeLinks = [...new Set(links.map(l => l.href))].filter(
                 u => u.startsWith(basePath),
             );
+            const index = await fetch(req.query.url);
+            index.body.pipe(createWriteStream(`${uploadPath}/index.html`));
 
             relativeLinks.forEach(async l => {
-                const name =
-                    l === req.query.url
-                        ? "index.html"
-                        : l.replace(basePath, "");
-                mkdirSync(`${uploadPath}/${dirname(name)}`, {
-                    recursive: true,
-                });
-                const response = await fetch(l);
-                response.body.pipe(createWriteStream(`${uploadPath}/${name}`));
+                if (l !== req.query.url) {
+                    const name = l.replace(basePath, "");
+                    mkdirSync(`${uploadPath}/${dirname(name)}`, {
+                        recursive: true,
+                    });
+                    const response = await fetch(l);
+                    response.body.pipe(
+                        createWriteStream(`${uploadPath}/${name}`),
+                    );
+                }
             });
 
             const baseUrl = `${req.protocol}://${req.get("host")}/${BASE_URI}`;
