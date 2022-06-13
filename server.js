@@ -190,13 +190,14 @@ app.get(
             const jsdom = new JSDOM(await originalDocument.text());
             const refs =
                 jsdom.window.document.querySelectorAll("[href], [src]");
-            const links = [];
+            const index = url.replace(/(\?|#).+/, "");
+            const links = [index];
             refs.forEach(ref => {
                 const u = new URL(
                     (ref.href || ref.src)
                         .replace("about:blank", "")
-                        .replace(/#.+/, ""),
-                    url,
+                        .replace(/(\?|#).+/, ""),
+                    url.replace(/(\?|#).+/, ""),
                 );
                 if (u.href.startsWith(basePath) && !links.includes(u.href)) {
                     links.push(u.href);
