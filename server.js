@@ -180,42 +180,41 @@ app.get(
                 .status(500)
                 .json({ error: `Unknown generator: ${req.query.type}` });
         }
-        const specURL = new URL(req.query.url);
+        const specURL = new URL(url);
         if (specURL.hostname === "raw.githubusercontent.com") {
             const uploadPath = await mkdtemp("uploads/");
-            const originalDocument = await fetch(req.query.url);
-            const basePath = dirname(req.query.url);
+            const originalDocument = await fetch(url);
+            const baseRegex =
+                /https:\/\/raw.githubusercontent.com\/.+?\/.+?\/.+?\//;
+            const basePath = req.query.url.match(baseRegex)[0];
             const jsdom = new JSDOM(await originalDocument.text());
             const refs =
                 jsdom.window.document.querySelectorAll("[href], [src]");
             const links = [];
             refs.forEach(ref => {
-                const u = (ref.href || ref.src)
-                    .replace("about:blank", "")
-                    .replace(/#.+/, "");
-                links.push(new URL(u, req.query.url));
-            });
-            const relativeLinks = [...new Set(links.map(l => l.href))].filter(
-                u => u.startsWith(basePath),
-            );
-            const index = await fetch(req.query.url);
-            index.body.pipe(createWriteStream(`${uploadPath}/index.html`));
-
-            relativeLinks.forEach(async l => {
-                if (l !== req.query.url) {
-                    const name = l.replace(basePath, "");
-                    mkdirSync(`${uploadPath}/${dirname(name)}`, {
-                        recursive: true,
-                    });
-                    const response = await fetch(l);
-                    response.body.pipe(
-                        createWriteStream(`${uploadPath}/${name}`),
-                    );
+                const u = new URL(
+                    (ref.href || ref.src)
+                        .replace("about:blank", "")
+                        .replace(/#.+/, ""),
+                    url,
+                );
+                if (u.href.startsWith(basePath) && !links.includes(u.href)) {
+                    links.push(u.href);
                 }
             });
 
+            links.forEach(async l => {
+                const name = l.replace(basePath, "");
+                mkdirSync(`${uploadPath}/${dirname(name)}`, {
+                    recursive: true,
+                });
+                const response = await fetch(l);
+                response.body.pipe(createWriteStream(`${uploadPath}/${name}`));
+            });
+
             const baseUrl = `${req.protocol}://${req.get("host")}/${BASE_URI}`;
-            req.query.url = `${baseUrl}${uploadPath}${specURL.search}`;
+            const newPath = url.replace(baseRegex, `${uploadPath}/`);
+            req.query.url = `${baseUrl}${newPath}${specURL.search}`;
             req.tmpDir = uploadPath;
         }
         next();
