@@ -11,7 +11,7 @@
     "mkdirp": "1.0",
     "node-fetch": "3.2.3",
     "request": "2.88.2",
-    "respec": "32.1.0",
+    "respec": "32.1.8",
     "tar-stream": "2.2.0"
   },
   "devDependencies": {
