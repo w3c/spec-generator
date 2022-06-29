@@ -193,7 +193,7 @@ app.get(
             const index = url.replace(/(\?|#).+/, "");
             const links = [index];
             refs.forEach(ref => {
-                if (ref) {
+                if (ref && (ref.href || ref.src)) {
                     const u = new URL(
                         (ref.href || ref.src)
                             .replace("about:blank", "")
