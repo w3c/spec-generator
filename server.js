@@ -193,14 +193,19 @@ app.get(
             const index = url.replace(/(\?|#).+/, "");
             const links = [index];
             refs.forEach(ref => {
-                const u = new URL(
-                    (ref.href || ref.src)
-                        .replace("about:blank", "")
-                        .replace(/(\?|#).+/, ""),
-                    url.replace(/(\?|#).+/, ""),
-                );
-                if (u.href.startsWith(basePath) && !links.includes(u.href)) {
-                    links.push(u.href);
+                if (ref) {
+                    const u = new URL(
+                        (ref.href || ref.src)
+                            .replace("about:blank", "")
+                            .replace(/(\?|#).+/, ""),
+                        url.replace(/(\?|#).+/, ""),
+                    );
+                    if (
+                        u.href.startsWith(basePath) &&
+                        !links.includes(u.href)
+                    ) {
+                        links.push(u.href);
+                    }
                 }
             });
 
