@@ -21,7 +21,7 @@ jobs:
     - run: npm test
 
     - name: Notify failure
-      uses: rectalogic/notify-irc@v1
+      uses: rectalogic/notify-irc@v2
       if: ${{ failure() }}
       with:
         server: "irc.w3.org"
