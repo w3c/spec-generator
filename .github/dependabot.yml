@@ -9,6 +9,13 @@ updates:
   ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-patch"]
+      # ignore minor updates for eslint and any packages starting "eslint"
+      - dependency-name: "eslint*"
+        update-types: ['version-update:semver-minor']
+      - dependency-name: "nodemon"
+        update-types: ['version-update:semver-minor']
+      - dependency-name: "husky"
+        update-types: ['version-update:semver-minor']
 - package-ecosystem: github-actions
   directory: '/'
   schedule:
