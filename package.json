@@ -9,7 +9,7 @@
     "file-type": "18.0.0",
     "jsdom": "20.0.0",
     "mkdirp": "1.0",
-    "node-fetch": "3.2.3",
+    "node-fetch": "3.3.0",
     "request": "2.88.2",
     "respec": "32.3.0",
     "tar-stream": "2.2.0"
