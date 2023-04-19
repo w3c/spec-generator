@@ -13,7 +13,7 @@ const BAD_SHORTNAME =
 const NO_RESPEC = "?type=respec&url=http://example.com/";
 const SUCCESS1 = `?type=respec&url=https://w3c.github.io/manifest/`;
 const SUCCESS2 = `?type=respec&url=https://w3c.github.io/payment-request/`;
-const SUCCESS3 = `?type=respec&url=https://w3c.github.io/resource-hints/`;
+const SUCCESS3 = `?type=respec&url=https://w3c.github.io/vc-di-ecdsa/`;
 
 const FAILS_WITH =
     (
@@ -95,7 +95,7 @@ describe("spec-generator", () => {
             REQUEST.get(BASE_URL + SUCCESS1, SUCCEEDS(done)));
         it('Payment Request API ("payment-request")', done =>
             REQUEST.get(BASE_URL + SUCCESS2, SUCCEEDS(done)));
-        it('Resource Hints ("resource-hints")', done =>
+        it('Resource Hints ("vc-di-ecdsa")', done =>
             REQUEST.get(BASE_URL + SUCCESS3, SUCCEEDS(done)));
     });
 
