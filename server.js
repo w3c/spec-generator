@@ -9,7 +9,7 @@ import { fileTypeFromBuffer } from "file-type";
 import tar from "tar-stream";
 import { JSDOM } from "jsdom";
 import request from "request";
-import mkdirp from "mkdirp";
+import { mkdirp } from "mkdirp";
 import fetch from "node-fetch";
 
 // eslint-disable-next-line import/extensions
