@@ -17,5 +17,5 @@ jobs:
 
     - run: npm install
     - run: npx respec2html -e --timeout 30 --src "https://w3c.github.io/html-aam/"
-    - run: npx respec2html -e --timeout 30 --src "https://w3c.github.io/resource-hints/"
+    - run: npx respec2html -e --timeout 30 --src "https://webmachinelearning.github.io/webnn/"
     - run: npm test
