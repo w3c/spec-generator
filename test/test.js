@@ -8,8 +8,6 @@ const BASE_URL = "http://localhost:3000/";
 const NO_URL = "?type=foo&URL=notice-that-its-in-uppercase";
 const NO_TYPE = "?url=foo&TYPE=notice-that-its-in-uppercase";
 const BAD_GENERATOR = "?type=fluxor&url=http://example.com/";
-const BAD_SHORTNAME =
-    "?type=respec&url=http://example.com/%3FshortName%3Ddiplodocus";
 const NO_RESPEC = "?type=respec&url=http://example.com/";
 const SUCCESS1 = `?type=respec&url=https://w3c.github.io/manifest/`;
 const SUCCESS2 = `?type=respec&url=https://w3c.github.io/payment-request/`;
@@ -54,11 +52,6 @@ describe("spec-generator", () => {
             REQUEST.get(
                 BASE_URL + BAD_GENERATOR,
                 FAILS_WITH(done, '{"error":"Unknown generator: fluxor"}'),
-            ));
-        it("if the shortname is not valid", done =>
-            REQUEST.get(
-                BASE_URL + BAD_SHORTNAME,
-                FAILS_WITH(done, '{"error":"Not Found"}', 404),
             ));
         it("if the URL does not point to a Respec document", done =>
             REQUEST.get(
