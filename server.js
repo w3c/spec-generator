@@ -35,77 +35,6 @@ app.use(
     }),
 );
 
-/**
- * @param {string} shortName
- * @param {string} publishDate
- * @returns {Promise<{ previousMaturity: string, previousPublishDate: string }>}
- * @throws {Promise<{ statusCode: number, error: string }>}
- */
-function getPreviousVersionInfo(shortName, publishDate) {
-    return new Promise((resolve, reject) => {
-        const url = `https://www.w3.org/TR/${shortName}/`;
-        request.get(url, (error, response, body) => {
-            if (error) {
-                // eslint-disable-next-line prefer-promise-reject-errors
-                return reject({ statusCode: 400, error });
-            }
-
-            if (
-                response &&
-                response.statusCode >= 400 &&
-                response.statusCode < 500
-            ) {
-                const { statusCode, statusMessage } = response;
-                // eslint-disable-next-line prefer-promise-reject-errors
-                return reject({ statusCode, error: statusMessage });
-            }
-
-            const { document } = new JSDOM(body).window;
-            const dl = document.querySelector("body div.head dl");
-
-            let thisURI;
-            let previousURI;
-            if (dl) {
-                // eslint-disable-next-line no-restricted-syntax
-                for (const dt of dl.querySelectorAll("dt")) {
-                    const txt = dt.textContent
-                        .toLocaleLowerCase()
-                        .replace(":", "")
-                        .replace("published", "")
-                        .trim();
-                    const dd = dt.nextElementSibling;
-                    if (txt === "this version") {
-                        thisURI = dd.querySelector("a").href;
-                    } else if (/^previous version(?:s)?$/.test(txt)) {
-                        previousURI = dd.querySelector("a").href;
-                    }
-                }
-            }
-            if (!thisURI) {
-                // eslint-disable-next-line prefer-promise-reject-errors
-                return reject({
-                    statusCode: 5000,
-                    error: `Couldn't find a 'This version' uri in the previous version.`,
-                });
-            }
-
-            const thisDate = thisURI.match(/[1-2][0-9]{7}/)[0];
-            const prev =
-                thisDate === publishDate.replace(/-/g, "")
-                    ? previousURI
-                    : thisURI;
-            const pDate = prev.match(/[1-2][0-9]{7}/)[0];
-
-            const previousMaturity = prev.match(/\/TR\/[0-9]{4}\/([A-Z]+)/)[1];
-            const previousPublishDate = pDate.replace(
-                /(\d{4})(\d{2})(\d{2})/,
-                "$1-$2-$3",
-            );
-            resolve({ previousMaturity, previousPublishDate });
-        });
-    });
-}
-
 async function extractTar(tarFile) {
     const extract = tar.extract();
     const uploadPath = await mkdtemp("uploads/");
@@ -227,25 +156,10 @@ app.get(
     },
     async (req, res) => {
         const specURL = new URL(req.query.url);
-        const shortName = specURL.searchParams.get("shortName");
         const publishDate =
             specURL.searchParams.get("publishDate") || getShortIsoDate();
 
         specURL.searchParams.set("publishDate", publishDate);
-
-        if (shortName) {
-            try {
-                const { previousMaturity, previousPublishDate } =
-                    await getPreviousVersionInfo(shortName, publishDate);
-                specURL.searchParams.set("previousMaturity", previousMaturity);
-                specURL.searchParams.set(
-                    "previousPublishDate",
-                    previousPublishDate,
-                );
-            } catch ({ statusCode, error }) {
-                return res.status(statusCode).json({ error });
-            }
-        }
 
         // if there's an error we get an err object with status and message, otherwise we get content
         try {
