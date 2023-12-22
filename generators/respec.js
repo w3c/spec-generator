@@ -15,6 +15,7 @@ export async function generate(url) {
         const { html, errors, warnings } = await toHTML(url, {
             timeout: 30000,
             disableSandbox: true,
+            disableGPU: true,
         });
         return { html, errors: errors.length, warnings: warnings.length };
     } catch (err) {
