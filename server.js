@@ -147,7 +147,7 @@ app.get(
                 response.body.pipe(createWriteStream(`${uploadPath}/${name}`));
             });
 
-            const baseUrl = `${req.protocol}://${req.get("host")}/${BASE_URI}`;
+            const baseUrl = `${req.protocol}://${req.get("host")}/`;
             const newPath = url.replace(baseRegex, `${uploadPath}/`);
             req.query.url = `${baseUrl}${newPath}${specURL.search}`;
             req.tmpDir = uploadPath;
