@@ -5,7 +5,7 @@
   "type": "module",
   "dependencies": {
     "express": "4.18.1",
-    "express-fileupload": "1.4.0",
+    "express-fileupload": "1.5.0",
     "file-type": "19.0.0",
     "jsdom": "24.0.0",
     "mkdirp": "3.0",
