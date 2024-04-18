@@ -1,6 +1,5 @@
 import ASSERT from "assert";
 import REQUEST from "request";
-// eslint-disable-next-line import/named, import/extensions
 import app, { server } from "../server.js";
 
 const PORT = 3000;

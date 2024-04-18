@@ -12,7 +12,6 @@ import request from "request";
 import { mkdirp } from "mkdirp";
 import fetch from "node-fetch";
 
-// eslint-disable-next-line import/extensions
 import { generate } from "./generators/respec.js";
 
 const genMap = {
@@ -67,7 +66,7 @@ async function extractTar(tarFile) {
 
         extract.on("finish", () => {
             if (!hasIndex) {
-                // eslint-disable-next-line prefer-promise-reject-errors
+                 
                 reject("No index.html file");
             } else {
                 resolve(uploadPath);
@@ -103,7 +102,7 @@ app.get(
                 .status(500)
                 .json({ error: "Both 'type' and 'url' are required." });
         }
-        // eslint-disable-next-line no-prototype-builtins
+         
         if (!genMap.hasOwnProperty(req.query.type)) {
             return res
                 .status(500)
