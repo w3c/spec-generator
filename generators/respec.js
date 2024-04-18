@@ -7,10 +7,9 @@ class SpecGeneratorError extends Error {
     }
 }
 
-// eslint-disable-next-line import/prefer-default-export
 export async function generate(url) {
     try {
-        // eslint-disable-next-line no-console
+         
         console.log("Generating", url);
         const { html, errors, warnings } = await toHTML(url, {
             timeout: 30000,
