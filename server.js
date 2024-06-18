@@ -207,7 +207,7 @@ app.post("/", async (req, res) => {
                 : // assume it's an HTML file
                   tempFilePath;
 
-        const baseUrl = `${req.protocol}://${req.get("host")}/${BASE_URI}`;
+        const baseUrl = `${req.protocol}://${req.get("host")}/`;
         const params = new URLSearchParams(req.body).toString();
         const src = `${baseUrl}${path}?${params}`;
         const qs = { url: src, type: "respec" };
