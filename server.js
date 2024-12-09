@@ -109,6 +109,7 @@ app.get(
                 .json({ error: `Unknown generator: ${req.query.type}` });
         }
         const specURL = new URL(url);
+        req.targetURL = req.query.url;
         if (specURL.hostname === "raw.githubusercontent.com") {
             const uploadPath = await mkdtemp("uploads/");
             const originalDocument = await fetch(url);
@@ -148,13 +149,13 @@ app.get(
 
             const baseUrl = `${req.protocol}://${req.get("host")}/`;
             const newPath = url.replace(baseRegex, `${uploadPath}/`);
-            req.query.url = `${baseUrl}${newPath}${specURL.search}`;
+            req.targetURL = `${baseUrl}${newPath}${specURL.search}`;
             req.tmpDir = uploadPath;
         }
         next();
     },
     async (req, res) => {
-        const specURL = new URL(req.query.url);
+        const specURL = new URL(req.targetURL);
         const publishDate =
             specURL.searchParams.get("publishDate") || getShortIsoDate();
 
