@@ -52,7 +52,7 @@ async function extractTar(tarFile) {
         extract.on("entry", (header, stream, next) => {
             stream.on("data", async data => {
                 if (uploadedFileIsAllowed(header.name)) {
-                    if (!hasIndex && header.name === "index.html") {
+                    if (header.name === "index.html" || header.name === "./index.html") {
                         hasIndex = true;
                     }
                     const filePath = `${uploadPath}/${header.name}`;
