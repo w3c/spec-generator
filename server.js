@@ -118,13 +118,13 @@ app.get(
             const basePath = req.query.url.match(baseRegex)[0];
             const jsdom = new JSDOM(await originalDocument.text());
             const refs =
-                jsdom.window.document.querySelectorAll("[href], [src]");
+                jsdom.window.document.querySelectorAll("[href], [src], [data-include]");
             const index = url.replace(/(\?|#).+/, "");
             const links = [index];
             refs.forEach(ref => {
-                if (ref && (ref.href || ref.src)) {
+                if (ref && (ref.href || ref.src || ref.dataset.include)) {
                     const u = new URL(
-                        (ref.href || ref.src)
+                        (ref.href || ref.src || ref.dataset.include)
                             .replace("about:blank", "")
                             .replace(/(\?|#).+/, ""),
                         url.replace(/(\?|#).+/, ""),
