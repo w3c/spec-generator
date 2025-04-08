@@ -4,7 +4,7 @@
   "license": "MIT",
   "type": "module",
   "dependencies": {
-    "express": "5.0.1",
+    "express": "5.1.0",
     "express-fileupload": "1.5.0",
     "file-type": "20.4.1",
     "jsdom": "26.0.0",
