@@ -6,7 +6,7 @@
   "dependencies": {
     "express": "5.1.0",
     "express-fileupload": "1.5.0",
-    "file-type": "20.4.1",
+    "file-type": "20.5.0",
     "jsdom": "26.1.0",
     "mkdirp": "3.0",
     "node-fetch": "3.3.0",
