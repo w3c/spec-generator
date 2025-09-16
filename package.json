@@ -7,7 +7,7 @@
     "express": "5.1.0",
     "express-fileupload": "1.5.0",
     "file-type": "21.0.0",
-    "jsdom": "26.1.0",
+    "jsdom": "27.0.0",
     "mkdirp": "3.0",
     "node-fetch": "3.3.0",
     "request": "2.88.2",
