@@ -9,7 +9,6 @@ class SpecGeneratorError extends Error {
 
 export async function generate(url) {
     try {
-         
         console.log("Generating", url);
         const { html, errors, warnings } = await toHTML(url, {
             timeout: 30000,

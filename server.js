@@ -52,7 +52,10 @@ async function extractTar(tarFile) {
         extract.on("entry", (header, stream, next) => {
             stream.on("data", async data => {
                 if (uploadedFileIsAllowed(header.name)) {
-                    if (header.name === "index.html" || header.name === "./index.html") {
+                    if (
+                        header.name === "index.html" ||
+                        header.name === "./index.html"
+                    ) {
                         hasIndex = true;
                     }
                     const filePath = `${uploadPath}/${header.name}`;
@@ -66,7 +69,6 @@ async function extractTar(tarFile) {
 
         extract.on("finish", () => {
             if (!hasIndex) {
-                 
                 reject("No index.html file");
             } else {
                 resolve(uploadPath);
@@ -102,7 +104,7 @@ app.get(
                 .status(500)
                 .json({ error: "Both 'type' and 'url' are required." });
         }
-         
+
         if (!genMap.hasOwnProperty(req.query.type)) {
             return res
                 .status(500)
@@ -117,8 +119,9 @@ app.get(
                 /https:\/\/raw.githubusercontent.com\/.+?\/.+?\/.+?\//;
             const basePath = req.query.url.match(baseRegex)[0];
             const jsdom = new JSDOM(await originalDocument.text());
-            const refs =
-                jsdom.window.document.querySelectorAll("[href], [src], [data-include]");
+            const refs = jsdom.window.document.querySelectorAll(
+                "[href], [src], [data-include]",
+            );
             const index = url.replace(/(\?|#).+/, "");
             const links = [index];
             refs.forEach(ref => {
