@@ -54,7 +54,7 @@ async function extractTar(tarFile: Buffer<ArrayBufferLike>) {
     return new Promise((resolve, reject) => {
         let hasIndex = false;
         extract.on("entry", (header, stream, next) => {
-            stream.on("data", async data => {
+            stream.on("data", async (data) => {
                 if (uploadedFileIsAllowed(header.name)) {
                     if (
                         header.name === "index.html" ||
