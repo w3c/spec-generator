@@ -111,13 +111,13 @@ app.get(
                 return res.send(FORM_HTML);
             }
             return res
-                .status(500)
+                .status(400)
                 .json({ error: "Both 'type' and 'url' are required." });
         }
 
         if (!isGeneratorType(type)) {
             return res
-                .status(500)
+                .status(400)
                 .json({ error: `Unknown generator: ${type}` });
         }
         const specURL = new URL(url);
@@ -207,12 +207,12 @@ app.post("/", async (req, res) => {
     const file = req.files?.file;
     if (!file) {
         return res.send({
-            status: 500,
+            status: 400,
             message: "No file uploaded",
         });
     } else if (Array.isArray(file)) {
         return res.send({
-            status: 500,
+            status: 400,
             message:
                 "Received multiple files; please upload a tar file instead",
         });

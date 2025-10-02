@@ -46,7 +46,7 @@ SERVER.close();    // To stop the server
 ### Errors
 
 If a required parameter is missing or has a value that is not understood, the generator returns a
-`500` error with a JSON payload the `error` field of which is the human-readable error message.
+`400` error with a JSON payload the `error` field of which is the human-readable error message.
 
 If the specific generator encounters a problem a similar error (mostly likely `500`) with the same
 sort of JSON message is returned. Specific generator types can extend this behaviour. The `respec`

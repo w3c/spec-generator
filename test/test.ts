@@ -19,7 +19,7 @@ const expectErrorStatus =
         expectedMessage:
             | string
             | RegExp = "{\"error\":\"Both 'type' and 'url' are required.\"}",
-        expectedCode = 500,
+        expectedCode = 400,
     ) =>
     async (response: Response) => {
         assert.equal(response.status, expectedCode);
@@ -66,6 +66,7 @@ describe("spec-generator", { timeout: 30000 }, () => {
             fetch(BASE_URL + NO_RESPEC).then(
                 expectErrorStatus(
                     /That doesn't seem to be a ReSpec document. Please check manually:/,
+                    500,
                 ),
                 failOnRejection,
             ));
