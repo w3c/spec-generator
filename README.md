@@ -11,19 +11,19 @@ This exposes a service to automatically generate specs from various source forma
 Start the server listening on port 80 by default:
 
 ```bash
-node server
+npm start
 ```
 
 You can specify a port like so:
 
 ```bash
-PORT=3000 node server
+PORT=3000 npm start
 ```
 
 When developing, you can use auto-reload:
 
 ```bash
-nodemon server
+npm run watch
 ```
 
 Spec Generator has a single endpoint, which is a `GET /`. This endpoint accepts parameters on its
@@ -37,9 +37,9 @@ query string. If the call is successful the generated content of the specificati
 ### As a Node.js module
 
 ```js
-const SPEC_GEN = require('w3c-spec-generator');
-const SERVER = SPEC_GEN.start();    // Optional port number (80 by default)
-// Now Spec Generator is listening on port 80
+const { start } = require('w3c-spec-generator');
+const SERVER = start();    // Optional port number (8000 by default)
+// Now Spec Generator is listening on port 8000
 SERVER.close();    // To stop the server
 ```
 

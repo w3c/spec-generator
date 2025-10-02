@@ -1,13 +1,20 @@
+/// <reference path="./respec.d.ts" />
 import { toHTML } from "respec";
 
+interface SpecGeneratorErrorConstructorOptions {
+    message: string;
+    status: number;
+}
+
 class SpecGeneratorError extends Error {
-    constructor({ status, message }) {
+    status: number;
+    constructor({ status, message }: SpecGeneratorErrorConstructorOptions) {
         super(message);
         this.status = status;
     }
 }
 
-export async function generate(url) {
+export async function generate(url: string) {
     try {
         console.log("Generating", url);
         const { html, errors, warnings } = await toHTML(url, {
