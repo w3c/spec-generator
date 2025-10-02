@@ -7,7 +7,7 @@ import express from "express";
 import fileUpload from "express-fileupload";
 import { fileTypeFromBuffer } from "file-type";
 import tar from "tar-stream";
-import { JSDOM } from "jsdom";
+import { load } from "cheerio";
 import request from "request";
 import { mkdirp } from "mkdirp";
 import fetch from "node-fetch";
@@ -83,12 +83,6 @@ async function extractTar(tarFile: Buffer<ArrayBufferLike>) {
     });
 }
 
-function resolveUrlFromElement(el: HTMLElement) {
-    if ("href" in el) return el.href as string;
-    if ("src" in el) return el.src as string;
-    return el.dataset.include;
-}
-
 // Listens to GET at the root, expects two required query string parameters:
 //  type:   the type of the generator (case-insensitive)
 //  url:    the URL to the source document
@@ -129,27 +123,21 @@ app.get(
             const baseRegex =
                 /https:\/\/raw.githubusercontent.com\/.+?\/.+?\/.+?\//;
             const basePath = (req.query.url as string).match(baseRegex)![0];
-            const jsdom = new JSDOM(await originalDocument.text());
-            const refs = jsdom.window.document.querySelectorAll(
-                "[href], [src], [data-include]",
-            ) as NodeListOf<HTMLElement>;
+            const $ = load(await originalDocument.text());
             const index = url.replace(/(\?|#).+/, "");
             const links = [index];
-            refs.forEach(ref => {
-                const refUrl = ref && resolveUrlFromElement(ref);
-                if (refUrl) {
-                    const u = new URL(
-                        refUrl
-                            .replace("about:blank", "")
-                            .replace(/(\?|#).+/, ""),
-                        url.replace(/(\?|#).+/, ""),
-                    );
-                    if (
-                        u.href.startsWith(basePath) &&
-                        !links.includes(u.href)
-                    ) {
-                        links.push(u.href);
-                    }
+            $("[href], [src], [data-include]").each((_, el) => {
+                const refUrl =
+                    el.attribs.href ||
+                    el.attribs.src ||
+                    el.attribs["data-include"];
+                if (!refUrl) return;
+                const u = new URL(
+                    refUrl.replace("about:blank", "").replace(/(\?|#).+/, ""),
+                    url.replace(/(\?|#).+/, ""),
+                );
+                if (u.href.startsWith(basePath) && !links.includes(u.href)) {
+                    links.push(u.href);
                 }
             });
 
