@@ -1,7 +1,7 @@
 import { extname, dirname } from "path";
 import { fileURLToPath, URL, URLSearchParams } from "url";
-import { readFile, unlink, rm, mkdtemp, writeFile } from "fs/promises";
-import { readFileSync, mkdirSync } from "fs";
+import { readFile, unlink, rm, mkdtemp, writeFile, mkdir } from "fs/promises";
+import { readFileSync } from "fs";
 
 import express from "express";
 import fileUpload from "express-fileupload";
@@ -9,7 +9,6 @@ import { fileTypeFromBuffer } from "file-type";
 import tar from "tar-stream";
 import { load } from "cheerio";
 import request from "request";
-import { mkdirp } from "mkdirp";
 
 import { generate } from "./generators/respec.js";
 
@@ -62,7 +61,7 @@ async function extractTar(tarFile: Buffer<ArrayBufferLike>) {
                         hasIndex = true;
                     }
                     const filePath = `${uploadPath}/${header.name}`;
-                    mkdirp.sync(dirname(filePath));
+                    await mkdir(dirname(filePath), { recursive: true });
                     await writeFile(filePath, data);
                 }
             });
@@ -142,7 +141,7 @@ app.get(
 
             for (const l of links) {
                 const name = l.replace(basePath, "");
-                mkdirSync(`${uploadPath}/${dirname(name)}`, {
+                await mkdir(`${uploadPath}/${dirname(name)}`, {
                     recursive: true,
                 });
                 const response = await fetch(l);
