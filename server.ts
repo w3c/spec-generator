@@ -1,7 +1,7 @@
 import { extname, dirname } from "path";
 import { fileURLToPath, URL, URLSearchParams } from "url";
 import { readFile, unlink, rm, mkdtemp, writeFile } from "fs/promises";
-import { readFileSync, mkdirSync, createWriteStream } from "fs";
+import { readFileSync, mkdirSync } from "fs";
 
 import express from "express";
 import fileUpload from "express-fileupload";
@@ -10,7 +10,6 @@ import tar from "tar-stream";
 import { load } from "cheerio";
 import request from "request";
 import { mkdirp } from "mkdirp";
-import fetch from "node-fetch";
 
 import { generate } from "./generators/respec.js";
 
@@ -141,14 +140,17 @@ app.get(
                 }
             });
 
-            links.forEach(async l => {
+            for (const l of links) {
                 const name = l.replace(basePath, "");
                 mkdirSync(`${uploadPath}/${dirname(name)}`, {
                     recursive: true,
                 });
                 const response = await fetch(l);
-                response.body!.pipe(createWriteStream(`${uploadPath}/${name}`));
-            });
+                await writeFile(
+                    `${uploadPath}/${name}`,
+                    await response.bytes(),
+                );
+            }
 
             const baseUrl = `${req.protocol}://${req.get("host")}/`;
             const newPath = url.replace(baseRegex, `${uploadPath}/`);
