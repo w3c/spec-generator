@@ -34,15 +34,6 @@ query string. If the call is successful the generated content of the specificati
 * `url` (required). The URL of the draft to fetch and generate from.
 * `publishDate`. The date at which the publication of this draft is supposed to occur.
 
-### As a Node.js module
-
-```js
-const { start } = require('w3c-spec-generator');
-const SERVER = start();    // Optional port number (8000 by default)
-// Now Spec Generator is listening on port 8000
-SERVER.close();    // To stop the server
-```
-
 ### Errors
 
 If a required parameter is missing or has a value that is not understood, the generator returns a
