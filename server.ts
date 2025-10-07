@@ -1,7 +1,6 @@
 import { extname, dirname } from "path";
 import { fileURLToPath, URL, URLSearchParams } from "url";
 import { readFile, unlink, rm, mkdtemp, writeFile, mkdir } from "fs/promises";
-import { readFileSync } from "fs";
 
 import express from "express";
 import fileUpload from "express-fileupload";
@@ -23,11 +22,12 @@ function isGeneratorType(type: string): type is GeneratorType {
 
 const app = express();
 
-const FORM_HTML = readFileSync("index.html", "utf-8");
+const FORM_HTML = await readFile("index.html", "utf-8");
 
 /** Get present date in YYYY-MM-DD format */
 const getShortIsoDate = () => new Date().toISOString().slice(0, 10);
 
+await mkdir("uploads", { recursive: true });
 app.use(
     fileUpload({
         createParentPath: true,
