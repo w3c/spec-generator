@@ -13,6 +13,7 @@ const NO_RESPEC = "?type=respec&url=http://example.com/";
 const SUCCESS1 = `?type=respec&url=https://w3c.github.io/manifest/`;
 const SUCCESS2 = `?type=respec&url=https://w3c.github.io/payment-request/`;
 const SUCCESS3 = `?type=respec&url=https://w3c.github.io/vc-di-ecdsa/`;
+const SUCCESS4 = `?type=respec&url=https://raw.githubusercontent.com/w3c/wcag/78d05337/guidelines/index.html`;
 
 const expectErrorStatus =
     (
@@ -34,12 +35,16 @@ const expectSuccessStatus = async (response: Response) => {
     assert.equal(response.statusText, "OK");
 };
 
+const expectNoFailedIncludes = async (response: Response) => {
+    assert.doesNotMatch(await response.text(), /Cannot GET \/uploads\//);
+};
+
 const failOnRejection = (error: Error) =>
     assert.fail(`Unexpected fetch promise rejection: ${error}`);
 
 let testServer: Server;
 
-describe("spec-generator", { timeout: 30000 }, () => {
+describe("spec-generator", { timeout: 45000 }, () => {
     before(() => {
         testServer = start(PORT);
     });
@@ -102,6 +107,11 @@ describe("spec-generator", { timeout: 30000 }, () => {
                 expectSuccessStatus,
                 failOnRejection,
             ));
+        it('WCAG 2.2 ("wcag22") via raw.githubusercontent', async () =>
+            fetch(BASE_URL + SUCCESS4).then((response) => {
+                expectSuccessStatus(response);
+                expectNoFailedIncludes(response);
+            }, failOnRejection));
     });
 
     after(() => testServer.close());
