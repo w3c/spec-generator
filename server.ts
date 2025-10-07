@@ -226,15 +226,18 @@ app.post("/", async (req, res) => {
         request.get({ url: baseUrl, qs }, (err, response, body) => {
             if (err) {
                 res.status(500).send(err);
+            } else if (response.statusCode >= 400) {
+                if (typeof response.headers["content-type"] !== "undefined")
+                    res.setHeader(
+                        "content-type",
+                        response.headers["content-type"],
+                    );
+                res.status(response.statusCode).send(body);
             } else {
-                res.setHeader(
-                    "x-errors-count",
-                    response.headers["x-errors-count"]!,
-                );
-                res.setHeader(
-                    "x-warnings-count",
-                    response.headers["x-warnings-count"]!,
-                );
+                for (const header of ["x-errors-count", "x-warnings-count"]) {
+                    if (typeof response.headers[header] !== "undefined")
+                        res.setHeader(header, response.headers[header]);
+                }
                 res.send(body);
                 // delete temp file(s)
                 unlink(tempFilePath);
