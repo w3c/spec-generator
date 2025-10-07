@@ -236,9 +236,9 @@ app.post("/", async (req, res) => {
                     response.headers["x-warnings-count"]!,
                 );
                 res.send(body);
-                // delete temp file
+                // delete temp file(s)
                 unlink(tempFilePath);
-                rm(path, { recursive: true });
+                if (tempFilePath !== path) rm(path, { recursive: true });
             }
         });
     } catch (err) {
