@@ -2,12 +2,11 @@ import { extname, dirname } from "path";
 import { fileURLToPath, URL, URLSearchParams } from "url";
 import { readFile, unlink, rm, mkdtemp, writeFile, mkdir } from "fs/promises";
 
-import express from "express";
+import express, { type Response as ExpressResponse } from "express";
 import fileUpload from "express-fileupload";
 import { fileTypeFromBuffer } from "file-type";
 import tar from "tar-stream";
 import { load } from "cheerio";
-import request from "request";
 
 import { generate } from "./generators/respec.js";
 
@@ -192,6 +191,18 @@ app.use(
     }),
 );
 
+async function forwardResponseWithHeaders(
+    res: ExpressResponse,
+    response: Response,
+    headers: string[],
+) {
+    for (const header of headers) {
+        if (response.headers.has(header))
+            res.setHeader(header, response.headers.get(header)!);
+    }
+    res.status(response.status).send(await response.bytes());
+}
+
 app.post("/", async (req, res) => {
     const file = req.files?.file;
     if (!file) {
@@ -219,31 +230,34 @@ app.post("/", async (req, res) => {
                 : // assume it's an HTML file
                   tempFilePath;
 
+        const generatorType = new URLSearchParams(req.body).get("type");
+        if (!generatorType) {
+            res.status(400).send("Missing type in POST body");
+            return;
+        }
+        if (!isGeneratorType(generatorType)) {
+            res.status(400).send(`Unknown generator: ${type}`);
+            return;
+        }
+
         const baseUrl = `${req.protocol}://${req.get("host")}/`;
-        const params = new URLSearchParams(req.body).toString();
-        const src = `${baseUrl}${path}?${params}`;
-        const qs = { url: src, type: "respec" };
-        request.get({ url: baseUrl, qs }, (err, response, body) => {
-            if (err) {
-                res.status(500).send(err);
-            } else if (response.statusCode >= 400) {
-                if (typeof response.headers["content-type"] !== "undefined")
-                    res.setHeader(
-                        "content-type",
-                        response.headers["content-type"],
-                    );
-                res.status(response.statusCode).send(body);
-            } else {
-                for (const header of ["x-errors-count", "x-warnings-count"]) {
-                    if (typeof response.headers[header] !== "undefined")
-                        res.setHeader(header, response.headers[header]);
-                }
-                res.send(body);
-                // delete temp file(s)
-                unlink(tempFilePath);
-                if (tempFilePath !== path) rm(path, { recursive: true });
-            }
-        });
+        const url = new URL(baseUrl);
+        url.searchParams.set("url", `${baseUrl}${path}`);
+        url.searchParams.set("type", generatorType);
+        const response = await fetch(url);
+
+        if (response.status >= 400) {
+            forwardResponseWithHeaders(res, response, ["content-type"]);
+        } else {
+            forwardResponseWithHeaders(res, response, [
+                "content-type",
+                "x-errors-count",
+                "x-warnings-count",
+            ]);
+            // delete temp file(s)
+            unlink(tempFilePath);
+            if (tempFilePath !== path) rm(path, { recursive: true });
+        }
     } catch (err) {
         res.status(500).send(err);
     }
