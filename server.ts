@@ -91,9 +91,7 @@ app.get(
                 ? req.query.type.toLowerCase()
                 : undefined;
         const url =
-            typeof req.query.url === "string"
-                ? decodeURIComponent(req.query.url)
-                : undefined;
+            typeof req.query.url === "string" ? req.query.url : undefined;
         if (!url || !type) {
             if (
                 req.headers.accept &&
