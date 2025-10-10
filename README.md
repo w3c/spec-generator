@@ -9,7 +9,7 @@ This exposes a service to automatically generate specs from various source forma
 
 ### Via HTTP
 
-Start the server listening on port 80 by default:
+Start the server listening on port 8000 by default:
 
 ```bash
 npm start
