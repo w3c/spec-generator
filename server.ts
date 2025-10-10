@@ -110,7 +110,7 @@ app.get(
                 .json({ error: `Unknown generator: ${type}` });
         }
         const specURL = new URL(url);
-        res.locals.targetURL = req.query.url;
+        res.locals.targetURL = url;
         res.locals.generatorType = type;
         if (specURL.hostname === "raw.githubusercontent.com") {
             const uploadPath = await mkdtemp("uploads/");
