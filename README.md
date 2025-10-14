@@ -5,9 +5,7 @@
 
 This exposes a service to automatically generate specs from various source formats.
 
-## API
-
-### Via HTTP
+## Running the server
 
 Start the server listening on port 8000 by default:
 
@@ -26,6 +24,22 @@ When developing, you can use auto-reload:
 ```bash
 npm run watch
 ```
+
+`tsx` can be skipped by building then running directly:
+
+```bash
+npm run build
+node server.js
+```
+
+This also supports the `PORT` environment variable as described above.
+
+To clear out built files, use `git clean`:
+
+- `git clean -ix` will present an interactive confirmation prompt
+- `git clean -fx` will remove the files immediately
+
+## API
 
 Spec Generator has a single endpoint, which is a `GET /`. This endpoint accepts parameters on its
 query string. If the call is successful the generated content of the specification is returned.

@@ -26,6 +26,7 @@
     "npm": ">=7"
   },
   "scripts": {
+    "build": "tsc --noEmit false",
     "lint": "tsc && prettier -c '**/*.ts'",
     "fix": "prettier -w '**/*.ts'",
     "test": "tsx test/test.ts",
