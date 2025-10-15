@@ -10,10 +10,8 @@ const NO_URL = "?type=foo&URL=notice-that-its-in-uppercase";
 const NO_TYPE = "?url=foo&TYPE=notice-that-its-in-uppercase";
 const BAD_GENERATOR = "?type=fluxor&url=http://example.com/";
 const NO_RESPEC = "?type=respec&url=http://example.com/";
-const SUCCESS1 = `?type=respec&url=https://w3c.github.io/manifest/`;
-const SUCCESS2 = `?type=respec&url=https://w3c.github.io/payment-request/`;
-const SUCCESS3 = `?type=respec&url=https://w3c.github.io/vc-di-ecdsa/`;
-const SUCCESS4 = `?type=respec&url=https://raw.githubusercontent.com/w3c/wcag/78d05337/guidelines/index.html`;
+const RESPEC_SUCCESS = `?type=respec&url=https://w3c.github.io/spec-generator/respec.html`;
+const RESPEC_SUCCESS_RAW = `?type=respec&url=https://raw.githubusercontent.com/w3c/spec-generator/refs/heads/gh-pages/respec.html`;
 
 const expectErrorStatus =
     (
@@ -36,7 +34,7 @@ const expectSuccessStatus = async (response: Response) => {
 };
 
 const expectNoFailedIncludes = async (response: Response) => {
-    assert.doesNotMatch(await response.text(), /Cannot GET \/uploads\//);
+    assert.doesNotMatch(await response.text(), /Cannot GET \//);
 };
 
 const failOnRejection = (error: Error) =>
@@ -44,7 +42,7 @@ const failOnRejection = (error: Error) =>
 
 let testServer: Server;
 
-describe("spec-generator", { timeout: 45000 }, () => {
+describe("spec-generator", { timeout: 30000 }, () => {
     before(() => {
         testServer = start(PORT);
     });
@@ -92,23 +90,13 @@ describe("spec-generator", { timeout: 45000 }, () => {
                     headers: { Accept: "text/html" },
                 }).then(expectSuccessStatus, failOnRejection));
         });
-        it('Web App Manifest ("appmanifest")', async () =>
-            fetch(BASE_URL + SUCCESS1).then(
-                expectSuccessStatus,
-                failOnRejection,
-            ));
-        it('Payment Request API ("payment-request")', async () =>
-            fetch(BASE_URL + SUCCESS2).then(
-                expectSuccessStatus,
-                failOnRejection,
-            ));
-        it('Resource Hints ("vc-di-ecdsa")', async () =>
-            fetch(BASE_URL + SUCCESS3).then(
-                expectSuccessStatus,
-                failOnRejection,
-            ));
-        it('WCAG 2.2 ("wcag22") via raw.githubusercontent', async () =>
-            fetch(BASE_URL + SUCCESS4).then((response) => {
+        it("Valid ReSpec document, via direct URL", async () =>
+            fetch(BASE_URL + RESPEC_SUCCESS).then((response) => {
+                expectSuccessStatus(response);
+                expectNoFailedIncludes(response);
+            }, failOnRejection));
+        it("Valid ReSpec document, via raw.githubusercontent", async () =>
+            fetch(BASE_URL + RESPEC_SUCCESS_RAW).then((response) => {
                 expectSuccessStatus(response);
                 expectNoFailedIncludes(response);
             }, failOnRejection));
