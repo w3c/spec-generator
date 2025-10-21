@@ -19,6 +19,9 @@ coverage
 # Compiled binary addons (http://nodejs.org/api/addons.html)
 build/Release
 
+# Files built from TypeScript
+*.js
+
 # temporary uploaded files
 uploads
 
@@ -29,4 +32,3 @@ node_modules
 
 # Users Environment Variables
 .lock-wscript
-package-lock.json

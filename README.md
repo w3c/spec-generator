@@ -1,30 +1,45 @@
-[![Build Status](https://travis-ci.com/w3c/spec-generator.svg?branch=main)](https://travis-ci.com/w3c/spec-generator)
+[![Lint status](https://github.com/w3c/spec-generator/actions/workflows/lint.yml/badge.svg)](https://github.com/w3c/spec-generator/actions/workflows/lint.yml)
+[![Tests status](https://github.com/w3c/spec-generator/actions/workflows/test.yml/badge.svg)](https://github.com/w3c/spec-generator/actions/workflows/test.yml)
 
 # Spec Generator
 
 This exposes a service to automatically generate specs from various source formats.
 
-## API
+## Running the server
 
-### Via HTTP
-
-Start the server listening on port 80 by default:
+Start the server listening on port 8000 by default:
 
 ```bash
-node server
+npm start
 ```
 
 You can specify a port like so:
 
 ```bash
-PORT=3000 node server
+PORT=3000 npm start
 ```
 
 When developing, you can use auto-reload:
 
 ```bash
-nodemon server
+npm run watch
 ```
+
+`tsx` can be skipped by building then running directly:
+
+```bash
+npm run build
+node server.js
+```
+
+This also supports the `PORT` environment variable as described above.
+
+To clear out built files, use `git clean`:
+
+- `git clean -ix` will present an interactive confirmation prompt
+- `git clean -fx` will remove the files immediately
+
+## API
 
 Spec Generator has a single endpoint, which is a `GET /`. This endpoint accepts parameters on its
 query string. If the call is successful the generated content of the specification is returned.
@@ -34,19 +49,10 @@ query string. If the call is successful the generated content of the specificati
 * `url` (required). The URL of the draft to fetch and generate from.
 * `publishDate`. The date at which the publication of this draft is supposed to occur.
 
-### As a Node.js module
-
-```js
-const SPEC_GEN = require('w3c-spec-generator');
-const SERVER = SPEC_GEN.start();    // Optional port number (80 by default)
-// Now Spec Generator is listening on port 80
-SERVER.close();    // To stop the server
-```
-
 ### Errors
 
 If a required parameter is missing or has a value that is not understood, the generator returns a
-`500` error with a JSON payload the `error` field of which is the human-readable error message.
+`400` error with a JSON payload the `error` field of which is the human-readable error message.
 
 If the specific generator encounters a problem a similar error (mostly likely `500`) with the same
 sort of JSON message is returned. Specific generator types can extend this behaviour. The `respec`
