@@ -270,4 +270,5 @@ export const start = (port = parseInt(process.env.PORT || "", 10) || 8000) => {
     return app.listen(port);
 };
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) start();
+if (process.argv[1] === fileURLToPath(import.meta.url) || process.env.pm_id)
+    start();
