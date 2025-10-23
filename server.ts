@@ -228,9 +228,10 @@ app.post("/", async (req, res) => {
                 : // assume it's an HTML file
                   tempFilePath;
 
-        const generatorType = new URLSearchParams(req.body).get("type");
+        const generatorType =
+            new URLSearchParams(req.body).get("type") || "" + req.query.type;
         if (!generatorType) {
-            res.status(400).send("Missing type in POST body");
+            res.status(400).send("Missing type in POST body or query params");
             return;
         }
         if (!isGeneratorType(generatorType)) {
