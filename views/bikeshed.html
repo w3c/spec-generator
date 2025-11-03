@@ -1,17 +1,21 @@
 {% layout layout.html, title: "Convert Bikeshed document to HTML" %}
+{% block head %}
+<style>
+    body:has(#type-issues-list:checked) #spec-options {
+        display: none;
+    }
+</style>
+{% endblock %}
 {% block %}
 <p><a href="../">Switch to Respec</a></p>
-<div>
-    <label for="type">Document type:</label>
-    <select name="type" id="type" required>
-        {% for item in bikeshedTypes %}
-        <option value="{{ item[0] }}" {% if forloop.first %} selected{% endif %}>
-            {{ item[1] }}
-        </option>
-        {% endfor %}
-    </select>
-</div>
 <fieldset>
+    <legend>Document type</legend>
+    {% for item in bikeshedTypes %}
+    <input id="type-{{ item[0] }}" type="radio" name="type" value="{{ item[0] }}"{% if forloop.first %} checked{% endif %}>
+    <label for="type-{{ item[0] }}">{{ item[1] }}</label>
+    {% endfor %}
+</fieldset>
+<fieldset id="spec-options">
     <legend>Bikeshed Spec Options</legend>
     <div>
         <label for="date">Date (defaults to <code>now</code>)</label>
