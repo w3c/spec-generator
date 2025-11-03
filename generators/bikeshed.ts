@@ -1,5 +1,5 @@
 import { exec, spawn } from "child_process";
-import { readFile, unlink } from "fs/promises";
+import { readFile, unlink, writeFile } from "fs/promises";
 import { tmpdir } from "os";
 import { join } from "path";
 import { promisify } from "util";
@@ -45,11 +45,14 @@ if (!bikeshedVersion) {
 
 const bikeshedTypes = {
     spec: "Spec (.bs)",
-    "issues-list": "Issues list (.bsi or .txt, via upload only)",
+    "issues-list": "Issues list (.bsi or .txt)",
 } as const;
 type BikeshedType = keyof typeof bikeshedTypes;
 const isBikeshedType = (type: string | null): type is BikeshedType =>
     !!type && type in bikeshedTypes;
+
+const generateFilename = (url: string) =>
+    join(tmpdir(), `spec-generator-${Date.now()}-${filenamify(url)}.html`);
 
 /**
  * Invokes bikeshed on a URL with the given options.
@@ -69,10 +72,7 @@ async function invokeBikeshed(
 
     // Bikeshed logs everything to stdout, so stderr is unused.
     // Output HTML to a file to make warnings/errors easier to parse.
-    const outputPath = join(
-        tmpdir(),
-        `${Date.now()}-${filenamify(input)}.html`,
-    );
+    const outputPath = generateFilename(input);
 
     return new Promise<BikeshedResult>(async (resolve, reject) => {
         // Use spawn instead of exec to make arguments injection-proof
@@ -194,12 +194,32 @@ async function invokeBikeshed(
     }).finally(() => unlink(outputPath).catch(() => {}));
 }
 
+/** Runs `bikeshed spec`, incorporating custom metadata. */
 const generateSpec = async (input: string, params: URLSearchParams) => {
     const metadataOverrides: string[] = [];
     for (const [key, value] of params.entries()) {
         if (key.startsWith("md-")) metadataOverrides.push(`--${key}=${value}`);
     }
     return invokeBikeshed(input, "spec", metadataOverrides);
+};
+
+/** Runs `bikeshed issues-list`, fetching from remote server if a URL is specified. */
+const generateIssuesList = async (input: string) => {
+    if (!/^https?:\/\//.test(input))
+        return invokeBikeshed(input, "issues-list");
+
+    const filename = generateFilename(input);
+    const response = await fetch(input);
+    if (response.status >= 400) {
+        throw new SpecGeneratorError(
+            `URL ${input} responded with ${response.status} status`,
+        );
+    }
+
+    await writeFile(filename, await response.text());
+    return invokeBikeshed(filename, "issues-list").finally(() =>
+        unlink(filename).catch(() => {}),
+    );
 };
 
 export const bikeshed = express.Router();
@@ -219,7 +239,7 @@ async function invokeBikeshedForRequest(
     try {
         const { html, ...messages } = await (type === "spec"
             ? generateSpec(input, mergeRequestParams(req))
-            : invokeBikeshed(input, "issues-list"));
+            : generateIssuesList(input));
         for (const k of Object.keys(messages)) {
             res.setHeader(
                 `x-${k}-count`,
