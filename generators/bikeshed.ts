@@ -121,8 +121,12 @@ async function invokeBikeshed(
                 const fatals: BikeshedResultMessage[] = [];
                 const outcomes: BikeshedMessage[] = [];
 
-                // Correct unfinished JSON in case of fatal error
-                const stdout = stdoutChunks.join("").replace(/,[\n\s]*$/, "]");
+                const stdout = stdoutChunks
+                    .join("")
+                    // Correct unfinished JSON in case of fatal error
+                    .replace(/,[\n\s]*$/, "]")
+                    // Correct for speced/bikeshed#3197
+                    .replace(/\n\[/g, "");
 
                 try {
                     const messages = JSON.parse(
