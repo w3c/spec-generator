@@ -1,7 +1,8 @@
 {% layout layout.html, title: "Convert Bikeshed document to HTML" %}
 {% block head %}
 <style>
-    body:has(#type-issues-list:checked) #spec-options {
+    body:has(#type-issues-list:checked) .spec-only,
+    body:has(#type-spec:checked) .issues-only {
         display: none;
     }
 </style>
@@ -15,8 +16,8 @@
     <label for="type-{{ item[0] }}">{{ item[1] }}</label>
     {% endfor %}
 </fieldset>
-<fieldset id="spec-options">
-    <legend>Bikeshed Spec Options</legend>
+<fieldset class="spec-only">
+    <legend>Spec options</legend>
     <div>
         <label for="date">Date (defaults to <code>now</code>)</label>
         <input name="md-date" id="date">
@@ -31,13 +32,20 @@
 </fieldset>
 <div class="either">
     <fieldset>
-        <label for="url">Spec URL</label>
+        <label for="url">
+            <span class="spec-only">Spec</span>
+            <span class="issues-only">Issues list</span>
+            URL
+        </label>
         <input type="url" name="url" id="url"
             placeholder="https://raw.githubusercontent.com/w3c/wcag-act/refs/heads/main/act-rules-format/act-rules-format.bs" />
         <button formmethod="GET">Generate</button>
     </fieldset>
     <fieldset>
-        <label for="file">Or, upload a spec, issues list, or <code>.tar</code> file</label>
+        <label for="file">Or, upload
+            <span class="spec-only">a <code>.bs</code> or <code>.tar</code> file</span>
+            <span class="issues-only">a <code>.bsi</code> or <code>.txt</code> file</span>
+        </label>
         <input type="file" name="file" id="file" accept="application/x-tar, .bs, .bsi, .txt" />
         <button formmethod="POST" formenctype="multipart/form-data">
             Upload and Generate

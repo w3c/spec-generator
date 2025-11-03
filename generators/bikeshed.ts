@@ -44,8 +44,8 @@ if (!bikeshedVersion) {
 }
 
 const bikeshedTypes = {
-    spec: "Spec (.bs)",
-    "issues-list": "Issues list (.bsi or .txt)",
+    spec: "Spec",
+    "issues-list": "Issues list",
 } as const;
 type BikeshedType = keyof typeof bikeshedTypes;
 const isBikeshedType = (type: string | null): type is BikeshedType =>
