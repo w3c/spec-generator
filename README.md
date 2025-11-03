@@ -5,6 +5,27 @@
 
 This exposes a service to automatically generate specs from various source formats.
 
+## Setup
+
+Clone or download the repository, then install dependencies:
+
+```
+npm install
+```
+
+### Bikeshed preparation
+
+In order for the server to field requests for Bikeshed documents,
+`bikeshed` must be installed such that it is executable by the user running the server.
+
+One straightforward way to accomplish this is to use [`pipx`](https://pipx.pypa.io/),
+which is designed for installing Python applications (as opposed to libraries),
+and is available through various package managers.
+
+```
+pipx install bikeshed
+```
+
 ## Running the server
 
 Start the server listening on port 8000 by default:

@@ -1,0 +1,43 @@
+{% layout layout.html, title: "Convert Bikeshed document to HTML" %}
+{% block %}
+<p><a href="../">Switch to Respec</a></p>
+<div>
+    <label for="type">Document type:</label>
+    <select name="type" id="type" required>
+        {% for item in bikeshedTypes %}
+        <option value="{{ item[0] }}" {% if forloop.first %} selected{% endif %}>
+            {{ item[1] }}
+        </option>
+        {% endfor %}
+    </select>
+</div>
+<fieldset>
+    <legend>Bikeshed Spec Options</legend>
+    <div>
+        <label for="date">Date (defaults to <code>now</code>)</label>
+        <input name="md-date" id="date">
+    </div>
+    <div>
+        <input type="checkbox" name="md-prepare-for-tr" value="yes" id="tr">
+        <label for="tr">Prepare for TR</label>
+    </div>
+    <div>
+
+    </div>
+</fieldset>
+<div class="either">
+    <fieldset>
+        <label for="url">Spec URL</label>
+        <input type="url" name="url" id="url"
+            placeholder="https://raw.githubusercontent.com/w3c/wcag-act/refs/heads/main/act-rules-format/act-rules-format.bs" />
+        <button formmethod="GET">Generate</button>
+    </fieldset>
+    <fieldset>
+        <label for="file">Or, upload a spec, issues list, or <code>.tar</code> file</label>
+        <input type="file" name="file" id="file" accept="application/x-tar, .bs, .bsi, .txt" />
+        <button formmethod="POST" formenctype="multipart/form-data">
+            Upload and Generate
+        </button>
+    </fieldset>
+</div>
+{% endblock %}

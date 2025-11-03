@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>{{ title }} - Spec Generator</title>
+        <style>
+            html,
+            body {
+                margin: 0;
+                padding: 0;
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            :root {
+                --bg-accent: #005a9c;
+                --bg-accent-alt: #08314f;
+            }
+
+            body {
+                font-family: sans-serif;
+                width: 70ch;
+                max-width: 95vw;
+                margin: 1em auto;
+            }
+
+            label {
+                line-height: 1.5;
+            }
+
+            input {
+                background: #eee;
+                border: 1px solid #999;
+                line-height: 1.5;
+                padding: 0.2rem;
+                margin-bottom: 0.5em;
+            }
+
+            fieldset {
+                margin: 0;
+                padding: 1em;
+            }
+
+            .either {
+                border-left: 0.5rem solid var(--bg-accent);
+                margin-top: 2rem;
+            }
+
+            .either fieldset {
+                border: none;
+            }
+
+            .either fieldset:first-child {
+                border-bottom: 0.5rem solid var(--bg-accent);
+            }
+
+            .either input {
+                width: 100%;
+            }
+
+            button {
+                display: block;
+                border: none;
+                background: var(--bg-accent);
+                color: #fff;
+                border-radius: 2px;
+                padding: 1em;
+            }
+
+            button:hover {
+                background: var(--bg-accent-alt);
+                cursor: pointer;
+            }
+
+            footer {
+                text-align: center;
+                margin: 1em;
+                margin-top: 5em;
+                border-top: 0.2rem solid;
+                padding: 0.5em;
+            }
+        </style>
+    </head>
+
+    <body>
+        <form action="">
+            <h1>{{ title }}</h1>
+            {% block %}{% endblock %}
+        </form>
+        <footer>
+            <p><a href="https://github.com/w3c/spec-generator">GitHub</a></p>
+        </footer>
+    </body>
+</html>

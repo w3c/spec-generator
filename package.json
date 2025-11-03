@@ -8,6 +8,8 @@
     "express": "^5.1.0",
     "express-fileupload": "^1.5.0",
     "file-type": "^21.0.0",
+    "filenamify": "^7.0.0",
+    "liquidjs": "^10.22.0",
     "respec": "35.6.0",
     "tar-stream": "^3.1.1",
     "tsx": "^4.20.6",
@@ -29,7 +31,7 @@
     "build": "tsc --noEmit false",
     "lint": "tsc && prettier -c '**/*.ts'",
     "fix": "prettier -w '**/*.ts'",
-    "test": "tsx test/test.ts",
+    "test": "tsx test/*.ts",
     "prepare": "husky install",
     "start": "tsx server.ts",
     "watch": "tsx watch server.ts"

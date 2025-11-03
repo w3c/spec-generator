@@ -7,17 +7,13 @@ import { start } from "../server.js";
 const PORT = 3000;
 const BASE_URL = "http://localhost:3000/";
 const NO_URL = "?type=foo&URL=notice-that-its-in-uppercase";
-const NO_TYPE = "?url=foo&TYPE=notice-that-its-in-uppercase";
-const BAD_GENERATOR = "?type=fluxor&url=http://example.com/";
 const NO_RESPEC = "?type=respec&url=http://example.com/";
 const RESPEC_SUCCESS = `?type=respec&url=https://w3c.github.io/spec-generator/respec.html`;
 const RESPEC_SUCCESS_RAW = `?type=respec&url=https://raw.githubusercontent.com/w3c/spec-generator/refs/heads/gh-pages/respec.html`;
 
 const expectErrorStatus =
     (
-        expectedMessage:
-            | string
-            | RegExp = "{\"error\":\"Both 'type' and 'url' are required.\"}",
+        expectedMessage: string | RegExp = '{"error":"\'url\' is required."}',
         expectedCode = 400,
     ) =>
     async (response: Response) => {
@@ -42,7 +38,7 @@ const failOnRejection = (error: Error) =>
 
 let testServer: Server;
 
-describe("spec-generator", { timeout: 30000 }, () => {
+describe("spec-generator: ReSpec", { timeout: 30000 }, () => {
     before(() => {
         testServer = start(PORT);
     });
@@ -53,16 +49,6 @@ describe("spec-generator", { timeout: 30000 }, () => {
         it("if there's no URL", async () =>
             fetch(BASE_URL + NO_URL).then(
                 expectErrorStatus(),
-                failOnRejection,
-            ));
-        it("if there's no type", async () =>
-            fetch(BASE_URL + NO_TYPE).then(
-                expectErrorStatus(),
-                failOnRejection,
-            ));
-        it("if the generator is not valid", async () =>
-            fetch(BASE_URL + BAD_GENERATOR).then(
-                expectErrorStatus('{"error":"Unknown generator: fluxor"}'),
                 failOnRejection,
             ));
         it("if the URL does not point to a Respec document", async () =>
@@ -83,10 +69,6 @@ describe("spec-generator", { timeout: 30000 }, () => {
                 }).then(expectSuccessStatus, failOnRejection));
             it("if there's no URL", async () =>
                 fetch(BASE_URL + NO_URL, {
-                    headers: { Accept: "text/html" },
-                }).then(expectSuccessStatus, failOnRejection));
-            it("if there's no type", async () =>
-                fetch(BASE_URL + NO_TYPE, {
                     headers: { Accept: "text/html" },
                 }).then(expectSuccessStatus, failOnRejection));
         });
