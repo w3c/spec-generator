@@ -57,12 +57,14 @@ const generateFilename = (url: string) =>
 /**
  * Invokes bikeshed on a URL with the given options.
  * @param input HTTPS URL or file path to process
- * @param options Additional CLI arguments
+ * @param modeOptions Additional CLI arguments specified after the mode
+ * @param globalOptions Additional CLI arguments specified before the mode
  */
 async function invokeBikeshed(
     input: string,
     mode: BikeshedType,
-    options: string[] = [],
+    modeOptions: string[] = [],
+    globalOptions: string[] = [],
 ) {
     if (!bikeshedVersion) {
         throw new SpecGeneratorError(
@@ -81,17 +83,16 @@ async function invokeBikeshed(
             [
                 "--print=json",
                 "--no-update",
+                ...globalOptions,
                 mode,
                 input,
                 outputPath,
-                ...options,
+                ...modeOptions,
             ],
             { timeout: 30000 },
         );
         const pid = bikeshedProcess.pid;
-        console.log(
-            `[bikeshed(${pid})] generating ${mode} ${input}${options.length ? ` (${options})` : ""}`,
-        );
+        console.log(`[bikeshed(${pid})] generating ${mode} ${input}`);
 
         const stdoutChunks: string[] = [];
         bikeshedProcess.stdout.on("data", (data) => stdoutChunks.push(data));
@@ -200,7 +201,12 @@ const generateSpec = async (input: string, params: URLSearchParams) => {
     for (const [key, value] of params.entries()) {
         if (key.startsWith("md-")) metadataOverrides.push(`--${key}=${value}`);
     }
-    return invokeBikeshed(input, "spec", metadataOverrides);
+    return invokeBikeshed(
+        input,
+        "spec",
+        metadataOverrides,
+        params.has("die-on") ? [`--die-on=${params.get("die-on")}`] : [],
+    );
 };
 
 /** Runs `bikeshed issues-list`, fetching from remote server if a URL is specified. */

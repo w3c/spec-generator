@@ -5,6 +5,15 @@
     body:has(#type-spec:checked) .issues-only {
         display: none;
     }
+
+    fieldset div:not(:first-of-type, :last-of-type) {
+        margin: 1em 0;
+    }
+
+    fieldset div label:first-child {
+        display: inline-block;
+        width: 12em;
+    }
 </style>
 {% endblock %}
 {% block %}
@@ -16,18 +25,27 @@
     <label for="type-{{ item[0] }}">{{ item[1] }}</label>
     {% endfor %}
 </fieldset>
-<fieldset class="spec-only">
-    <legend>Spec options</legend>
+<fieldset>
+    <legend>Options</legend>
     <div>
+        <label for="die-on">Die on</label>
+        <select name="die-on" id="die-on">
+            <option value="nothing">Nothing (force)</option>
+            <option value="fatal" selected>Fatal</option>
+            <option value="link-error">Link error</option>
+            <option value="warning">Warning</option>
+            <option value="lint">Lint</option>
+            <option value="message">Message</option>
+            <option value="everything">Everything</option>
+        </select>
+    </div>
+    <div class="spec-only">
         <label for="date">Date (defaults to <code>now</code>)</label>
         <input name="md-date" id="date">
     </div>
-    <div>
+    <div class="spec-only">
         <input type="checkbox" name="md-prepare-for-tr" value="yes" id="tr">
         <label for="tr">Prepare for TR</label>
-    </div>
-    <div>
-
     </div>
 </fieldset>
 <div class="either">
