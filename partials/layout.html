@@ -55,6 +55,10 @@
                 border: none;
             }
 
+            .either fieldset + fieldset {
+                margin: 0;
+            }
+
             .either fieldset:first-child {
                 border-bottom: 0.5rem solid var(--bg-accent);
             }
@@ -80,11 +84,12 @@
             }
 
             footer {
-                text-align: center;
+                display: flex;
+                justify-content: space-between;
                 margin: 1em;
-                margin-top: 5em;
-                border-top: 0.2rem solid;
-                padding: 0.5em;
+                margin-top: 3em;
+                border-top: 2px solid;
+                padding: 0.5em 0;
             }
         </style>
         {% block head %}{% endblock %}
@@ -96,7 +101,8 @@
             {% block %}{% endblock %}
         </form>
         <footer>
-            <p><a href="https://github.com/w3c/spec-generator">GitHub</a></p>
+            {% block footer %}<div></div>{% endblock %}
+            <a href="https://github.com/w3c/spec-generator">GitHub</a>
         </footer>
     </body>
 </html>

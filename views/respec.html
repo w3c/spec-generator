@@ -1,6 +1,5 @@
 {% layout layout.html, title: "Convert ReSpec document to HTML" %}
 {% block %}
-<p><a href="bikeshed/">Switch to Bikeshed</a></p>
 <div class="either">
     <fieldset>
         <label for="url">Spec URL (with optional query parameters)</label>
@@ -16,4 +15,7 @@
         </button>
     </fieldset>
 </div>
+{% endblock %}
+{% block footer %}
+<a href="bikeshed/">Switch to Bikeshed</a>
 {% endblock %}

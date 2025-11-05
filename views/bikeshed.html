@@ -12,12 +12,11 @@
 
     fieldset div label:first-child {
         display: inline-block;
-        width: 12em;
+        width: 10em;
     }
 </style>
 {% endblock %}
 {% block %}
-<p><a href="../">Switch to Respec</a></p>
 <fieldset>
     <legend>Document type</legend>
     {% for item in bikeshedTypes %}
@@ -40,8 +39,10 @@
         </select>
     </div>
     <div class="spec-only">
-        <label for="date">Date (defaults to <code>now</code>)</label>
-        <input name="md-date" id="date">
+        <div>
+            <label for="date">Date <i>(YYYY-MM-DD)</i></label>
+            <input name="md-date" id="date">
+        </div>
     </div>
     <div class="spec-only">
         <input type="checkbox" name="md-prepare-for-tr" value="yes" id="tr">
@@ -56,7 +57,7 @@
             URL
         </label>
         <input type="url" name="url" id="url"
-            placeholder="https://raw.githubusercontent.com/w3c/wcag-act/refs/heads/main/act-rules-format/act-rules-format.bs" />
+            placeholder="https://raw.githubusercontent.com/w3c/process/refs/heads/main/index.bs" />
         <button formmethod="GET">Generate</button>
     </fieldset>
     <fieldset>
@@ -70,4 +71,7 @@
         </button>
     </fieldset>
 </div>
+{% endblock %}
+{% block footer %}
+<a href="../">Switch to Respec</a>
 {% endblock %}
