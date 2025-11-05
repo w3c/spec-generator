@@ -274,20 +274,15 @@ bikeshed.get("/", async (req, res) => {
 bikeshed.post("/", async (req, res) => {
     const file = req.files?.file;
     if (Array.isArray(file)) {
-        return res.send({
-            status: 400,
-            message:
-                "Received multiple files; please upload a tar file instead",
+        return res.status(400).json({
+            error: "Received multiple files; please upload a tar file instead",
         });
     }
 
     const url = mergeRequestParams(req).get("url");
     const input = file?.tempFilePath || url;
     if (!input) {
-        return res.send({
-            status: 400,
-            message: "Missing file upload or url",
-        });
+        return res.status(400).json({ error: "Missing file upload or url" });
     }
 
     await invokeBikeshedForRequest(input, req, res);

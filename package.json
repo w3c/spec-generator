@@ -31,7 +31,7 @@
     "build": "tsc --noEmit false",
     "lint": "tsc && prettier -c '**/*.ts'",
     "fix": "prettier -w '**/*.ts'",
-    "test": "tsx test/*.ts",
+    "test": "tsx test/*.test.ts",
     "prepare": "husky install",
     "start": "tsx server.ts",
     "watch": "tsx watch server.ts"

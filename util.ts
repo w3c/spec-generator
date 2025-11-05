@@ -1,13 +1,22 @@
 import type { Request } from "express";
 
-/** Appends multiple URLSearchParams instances into the first one passed */
+/** Appends multiple URLSearchParams or FormData instances into the first one passed */
 export function appendParams(
     destination: URLSearchParams,
     ...sources: URLSearchParams[]
+): URLSearchParams;
+export function appendParams(
+    destination: FormData,
+    ...sources: FormData[] | URLSearchParams[]
+): FormData;
+export function appendParams(
+    destination: URLSearchParams | FormData,
+    ...sources: URLSearchParams[] | FormData[]
 ) {
     for (const source of sources) {
         for (const [k, v] of source.entries()) {
-            destination.append(k, v);
+            // Skip file inputs in case of FormData
+            if (typeof v === "string") destination.append(k, v);
         }
     }
     return destination;
