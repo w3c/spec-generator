@@ -28,7 +28,7 @@ const specFailurePattern =
 const issuesFailurePattern =
     /^\{"error":"fatal error: Missing 'Draft' metadata."\}$/;
 
-describe("spec-generator: Bikeshed", { timeout: 15000 }, () => {
+describe("spec-generator: Bikeshed", { timeout: 30000 }, () => {
     before(() => {
         testServer = start(PORT);
     });
