@@ -199,7 +199,8 @@ async function invokeBikeshed(
 const generateSpec = async (input: string, params: URLSearchParams) => {
     const metadataOverrides: string[] = [];
     for (const [key, value] of params.entries()) {
-        if (key.startsWith("md-")) metadataOverrides.push(`--${key}=${value}`);
+        if (key.startsWith("md-") && value)
+            metadataOverrides.push(`--${key}=${value}`);
     }
     return invokeBikeshed(
         input,
