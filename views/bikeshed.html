@@ -71,6 +71,26 @@
         </button>
     </fieldset>
 </div>
+<details>
+    <summary><h2>HTTP API Help</h2></summary>
+    <p>This API may be accessed via GET or POST, with the following parameters:</p>
+    <dl>
+        <dt>url</dt>
+        <dd>URL to process; required if file is not set</dd>
+        <dt>file</dt>
+        <dd>File upload to process (POST only); required if url is not set, and takes precedence if both are set</dd>
+        <dt>type</dt>
+        <dd>Type of processing to perform: <code>spec</code> or <code>issues-list</code></dd>
+        <dt>die-on</dt>
+        <dd>
+            Select what levels of events cause processing to fail;
+            possible values are <code>nothing</code>, <code>fatal</code> (default),
+            <code>link-error</code>, <code>warning</code>, <code>lint</code>, <code>message</code>, or <code>everything</code>
+        </dd>
+        <dt>md-&lt;key&gt;</dt>
+        <dd>Override metadata (e.g. <code>md-date=YYYY-MM-DD</code> or <code>md-prepare-for-tr=yes</code> as exposed in the form above)</dd>
+    </dl>
+</details>
 {% endblock %}
 {% block footer %}
 <a href="../">Switch to Respec</a>
