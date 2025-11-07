@@ -122,13 +122,7 @@ async function invokeBikeshed(
                 const fatals: BikeshedResultMessage[] = [];
                 const outcomes: BikeshedMessage[] = [];
 
-                const stdout = stdoutChunks
-                    .join("")
-                    // Correct unfinished JSON in case of fatal error,
-                    // which may not include a trailing comma in 5.3.5 (#3198)
-                    .replace(/\},?[\n\s]*$/, "}]")
-                    // Correct for #3197 (fixed in bikeshed 5.3.5)
-                    .replace(/\n\[/g, "");
+                const stdout = stdoutChunks.join("");
 
                 try {
                     const messages = JSON.parse(
