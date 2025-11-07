@@ -17,6 +17,7 @@ npm install
 
 In order for the server to field requests for Bikeshed documents,
 `bikeshed` must be installed such that it is executable by the user running the server.
+Version 5.3.6 is required at minimum, as it containes fixes related to JSON output.
 
 One straightforward way to accomplish this is to use [`pipx`](https://pipx.pypa.io/),
 which is designed for installing Python applications (as opposed to libraries),
