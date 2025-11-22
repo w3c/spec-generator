@@ -4,10 +4,9 @@ import { tmpdir } from "os";
 import { join } from "path";
 import { promisify } from "util";
 
-import express, { type Request, type Response } from "express";
 import filenamify from "filenamify";
 
-import { mergeRequestParams } from "../util.js";
+import type { ValidateParamsResult } from "../server.js";
 import { SpecGeneratorError } from "./common.js";
 
 interface BikeshedMessage {
@@ -43,14 +42,6 @@ if (!bikeshedVersion) {
   console.warn("Bikeshed requests will result in 500 responses.");
 }
 
-const bikeshedTypes = {
-  spec: "Spec",
-  "issues-list": "Issues list",
-} as const;
-type BikeshedType = keyof typeof bikeshedTypes;
-const isBikeshedType = (type: string | null): type is BikeshedType =>
-  !!type && type in bikeshedTypes;
-
 const generateFilename = (url: string) =>
   join(tmpdir(), `spec-generator-${Date.now()}-${filenamify(url)}.html`);
 
@@ -62,7 +53,7 @@ const generateFilename = (url: string) =>
  */
 async function invokeBikeshed(
   input: string,
-  mode: BikeshedType,
+  mode: "spec" | "issues-list",
   modeOptions: string[] = [],
   globalOptions: string[] = [],
 ) {
@@ -208,23 +199,16 @@ const generateIssuesList = async (input: string) => {
   );
 };
 
-export const bikeshed = express.Router();
+export async function generateBikeshed(result: ValidateParamsResult) {
+  const { file, params, res, type, url } = result;
 
-async function invokeBikeshedForRequest(
-  input: string,
-  req: Request,
-  res: Response,
-) {
-  const params = mergeRequestParams(req);
-  const type = params.get("type");
-  if (!isBikeshedType(type)) {
-    res.status(400).send(`Unknown type: ${type}`);
-    return;
-  }
+  const input = file?.tempFilePath || url;
+  // Return early for type-safety; this should already be handled by server.ts
+  if (!input) return;
 
   try {
-    const { html, ...messages } = await (type === "spec"
-      ? generateSpec(input, mergeRequestParams(req))
+    const { html, ...messages } = await (type === "bikeshed-spec"
+      ? generateSpec(input, params)
       : generateIssuesList(input));
     for (const k of Object.keys(messages)) {
       res.setHeader(
@@ -237,34 +221,3 @@ async function invokeBikeshedForRequest(
     res.status(err.status).json({ error: err.message });
   }
 }
-
-bikeshed.get("/", async (req, res) => {
-  const url = typeof req.query.url === "string" ? req.query.url : undefined;
-  if (!url || !req.query.type) {
-    if (req.headers.accept?.includes("text/html"))
-      return res.render("bikeshed", { bikeshedTypes });
-    return res
-      .status(400)
-      .json({ error: "Both 'type' and 'url' are required." });
-  }
-
-  await invokeBikeshedForRequest(url, req, res);
-});
-
-bikeshed.post("/", async (req, res) => {
-  const file = req.files?.file;
-  if (Array.isArray(file)) {
-    return res.status(400).json({
-      error: "Received multiple files; please upload a tar file instead",
-    });
-  }
-
-  const url = mergeRequestParams(req).get("url");
-  const input = file?.tempFilePath || url;
-  if (!input) {
-    return res.status(400).json({ error: "Missing file upload or url" });
-  }
-
-  await invokeBikeshedForRequest(input, req, res);
-  if (file) await unlink(file.tempFilePath).catch(() => {});
-});

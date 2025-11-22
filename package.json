@@ -9,7 +9,6 @@
     "express-fileupload": "^1.5.0",
     "file-type": "^21.0.0",
     "filenamify": "^7.0.0",
-    "liquidjs": "^10.22.0",
     "respec": "35.6.0",
     "tar-stream": "^3.1.1",
     "tsx": "^4.20.6",
@@ -29,11 +28,11 @@
   },
   "scripts": {
     "build": "tsc --noEmit false",
-    "lint": "tsc && prettier -c '**/*.ts'",
-    "fix": "prettier -w '**/*.ts'",
-    "test": "tsx test/*.test.ts",
+    "lint": "tsc && prettier -c '**/*.ts' index.html",
+    "fix": "prettier -w '**/*.ts' index.html",
+    "test": "tsx test/index.test.ts",
     "prepare": "husky install",
     "start": "tsx server.ts",
-    "watch": "tsx watch server.ts"
+    "watch": "tsx watch --include index.html server.ts"
   }
 }

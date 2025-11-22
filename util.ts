@@ -16,7 +16,7 @@ export function appendParams(
   for (const source of sources) {
     for (const [k, v] of source.entries()) {
       // Skip file inputs in case of FormData
-      if (typeof v === "string") destination.append(k, v);
+      if (typeof v === "string") destination.set(k, v);
     }
   }
   return destination;

@@ -3,6 +3,8 @@ interface ToHTMLOptions {
   disableSandbox?: boolean;
   disableGPU?: boolean;
   devtools?: boolean;
+  haltonerror?: boolean;
+  haltonwarn?: boolean;
   useLocal?: boolean;
   onError?: (error: any) => void;
   onProgress?: (msg: string, remaining: number) => void;

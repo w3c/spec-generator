@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spec Generator</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg-accent: #005a9c;
+        --bg-accent-alt: #08314f;
+      }
+
+      body {
+        font-family: sans-serif;
+        width: 70ch;
+        max-width: 95vw;
+        margin: 1em auto;
+      }
+
+      label {
+        line-height: 1.5;
+      }
+
+      input {
+        background: #eee;
+        border: 1px solid #999;
+        padding: 0.2rem;
+      }
+
+      fieldset {
+        margin: 0;
+        padding: 1em;
+      }
+
+      fieldset + fieldset {
+        margin-top: 1em;
+      }
+
+      fieldset div:not(:first-of-type, :last-of-type) {
+        margin: 1em 0;
+      }
+
+      fieldset div label:first-child {
+        display: inline-block;
+        width: 10em;
+      }
+
+      .either {
+        border-left: 0.5rem solid var(--bg-accent);
+        margin-top: 2rem;
+      }
+
+      .either fieldset {
+        border: none;
+      }
+
+      .either fieldset + fieldset {
+        margin: 0;
+      }
+
+      .either fieldset:first-child {
+        border-bottom: 0.5rem solid var(--bg-accent);
+      }
+
+      .either input {
+        line-height: 1.5;
+        margin-bottom: 0.5em;
+        width: 100%;
+      }
+
+      button {
+        display: block;
+        border: none;
+        background: var(--bg-accent);
+        color: #fff;
+        border-radius: 2px;
+        padding: 1em;
+      }
+
+      button:hover {
+        background: var(--bg-accent-alt);
+        cursor: pointer;
+      }
+
+      code {
+        font-size: 1rem;
+      }
+
+      dt {
+        font-weight: bold;
+      }
+
+      dd {
+        margin-bottom: 1em;
+        margin-top: 1em;
+      }
+
+      summary h2 {
+        display: inline;
+        line-height: 3em;
+      }
+
+      footer {
+        margin: 3em 0;
+        border-top: 2px solid;
+        padding: 0.5em 0;
+        text-align: center;
+      }
+
+      body:has(#type-respec:checked) .only-bikeshed-spec,
+      body:has(#type-respec:checked) .only-bikeshed-issues-list,
+      body:has(#type-respec:checked) .non-respec,
+      body:has(#type-bikeshed-spec:checked) .only-respec,
+      body:has(#type-bikeshed-spec:checked) .only-bikeshed-issues-list,
+      body:has(#type-bikeshed-issues-list:checked) .only-respec,
+      body:has(#type-bikeshed-issues-list:checked) .only-bikeshed-spec,
+      body:has(#type-bikeshed-issues-list:checked) .non-bikeshed-issues-list {
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <form action="">
+      <h1>Convert document to HTML</h1>
+      <fieldset>
+        <legend>Document type</legend>
+        <input
+          id="type-respec"
+          type="radio"
+          name="type"
+          value="respec"
+          checked
+        />&nbsp;<label for="type-respec">ReSpec</label>
+        <input
+          id="type-bikeshed-spec"
+          type="radio"
+          name="type"
+          value="bikeshed-spec"
+        />&nbsp;<label for="type-bikeshed-spec">Bikeshed Spec</label>
+        <input
+          id="type-bikeshed-issues-list"
+          type="radio"
+          name="type"
+          value="bikeshed-issues-list"
+        />&nbsp;<label for="type-bikeshed-issues-list"
+          >Bikeshed Issues List</label
+        >
+      </fieldset>
+      <fieldset>
+        <legend>Options</legend>
+        <div>
+          <label for="die-on">Die on</label>
+          <select name="die-on" id="die-on">
+            <option value="nothing" selected>Nothing (force)</option>
+            <option class="non-respec" value="fatal">Fatal</option>
+            <option class="only-respec" value="error">Error</option>
+            <option class="non-respec" value="link-error">Link error</option>
+            <option value="warning">Warning</option>
+            <option class="non-respec" value="lint">Lint</option>
+            <option class="non-respec" value="message">Message</option>
+            <option value="everything">Everything</option>
+          </select>
+        </div>
+        <div class="non-bikeshed-issues-list">
+          <div>
+            <label for="date">Date <i>(YYYY-MM-DD)</i></label>
+            <input name="md-date" id="date" />
+          </div>
+        </div>
+        <div class="only-bikeshed-spec">
+          <input type="checkbox" name="md-prepare-for-tr" value="yes" id="tr" />
+          <label for="tr">Prepare for TR</label>
+        </div>
+      </fieldset>
+      <div class="either">
+        <fieldset>
+          <label for="url">
+            <span class="non-bikeshed-issues-list">Spec</span>
+            <span class="only-bikeshed-issues-list">Issues list</span>
+            URL
+            <span class="only-respec">(with optional query parameters)</span>
+          </label>
+          <input
+            type="url"
+            name="url"
+            id="url"
+            placeholder="https://w3c.github.io/manifest/?specStatus=WD&publishDate=2020-10-20"
+          />
+          <button formmethod="GET">Generate</button>
+        </fieldset>
+        <fieldset>
+          <label for="file">
+            Or, upload a
+            <span class="non-bikeshed-issues-list">
+              <code class="only-bikeshed-spec">.bs</code>
+              <code class="only-respec">.html</code>
+              or <code>.tar</code>
+            </span>
+            <span class="only-bikeshed-issues-list">
+              <code>.bsi</code> or <code>.txt</code>
+            </span>
+            file
+          </label>
+          <input
+            type="file"
+            name="file"
+            id="file"
+            accept="application/x-tar, text/html, text/plain, .bs, .bsi"
+          />
+          <button formmethod="POST" formenctype="multipart/form-data">
+            Upload and Generate
+          </button>
+        </fieldset>
+      </div>
+    </form>
+    <details>
+      <summary><h2>HTTP API Help</h2></summary>
+      <p>
+        This API may be accessed via GET or POST, with the following parameters:
+      </p>
+      <dl>
+        <dt>url</dt>
+        <dd>URL to process; required if file is not set</dd>
+        <dt>file</dt>
+        <dd>
+          File upload to process (POST only); required if url is not set, and
+          takes precedence if both are set
+        </dd>
+        <dt>type</dt>
+        <dd>
+          Type of processing to perform: <code>respec</code>,
+          <code>bikeshed-spec</code>, or
+          <code>bikeshed-issues-list</code>
+        </dd>
+        <dt>die-on</dt>
+        <dd>
+          <p>
+            Which levels of events cause processing to fail; values are
+            generator-specific.
+          </p>
+          <p>Values for ReSpec:</p>
+          <ul>
+            <li>nothing (default)</li>
+            <li>error</li>
+            <li>warning</li>
+            <li>everything</li>
+          </ul>
+          <p>Values for Bikeshed:</p>
+          <ul>
+            <li>nothing</li>
+            <li>fatal (default)</li>
+            <li>link-error</li>
+            <li>warning</li>
+            <li>lint</li>
+            <li>message</li>
+            <li>everything</li>
+          </ul>
+        </dd>
+        <dt>md-&lt;key&gt;</dt>
+        <dd>
+          <p>
+            Override <code>respecConfig</code> or Bikeshed metadata (e.g.
+            <code>md-date=YYYY-MM-DD</code> as exposed in the form above).
+          </p>
+          <p>
+            With the exception of <code>md-date</code>, keys are
+            generator-specific, but use the same <code>md-</code> prefix for
+            consistency.
+          </p>
+          <p>
+            Note that in the case of ReSpec requests using <code>url</code>, it
+            is also possible to specify overrides via query parameters within
+            the <code>url</code> parameter. The
+            <code>md-&lt;key&gt;</code> pattern is carried over from Bikeshed to
+            make overrides possible for ReSpec upload requests.
+          </p>
+        </dd>
+      </dl>
+    </details>
+    <footer>
+      <a href="https://github.com/w3c/spec-generator">GitHub</a>
+    </footer>
+    <script>
+      function updateOnChange(id, dieOn, urlPlaceholder) {
+        document.getElementById(id).addEventListener("change", () => {
+          document.getElementById("die-on").value = dieOn;
+          document.getElementById("url").placeholder = urlPlaceholder;
+        });
+      }
+
+      updateOnChange(
+        "type-respec",
+        "nothing",
+        "https://w3c.github.io/manifest/?specStatus=WD&publishDate=2020-10-20",
+      );
+      updateOnChange(
+        "type-bikeshed-spec",
+        "fatal",
+        "https://raw.githubusercontent.com/w3c/process/refs/heads/main/index.bs",
+      );
+      updateOnChange(
+        "type-bikeshed-issues-list",
+        "fatal",
+        "https://raw.githubusercontent.com/w3c/process/refs/heads/main/issues-20210603.txt",
+      );
+    </script>
+  </body>
+</html>
