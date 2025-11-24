@@ -15,7 +15,6 @@ import { SpecGeneratorError } from "./common.js";
 async function invokeRespec(url: URL, params: URLSearchParams) {
   try {
     console.log(`[respec] generating ${url}`);
-    const dieOn = params.get("die-on");
 
     const configParams = new URLSearchParams();
     for (const [key, value] of params.entries()) {
@@ -38,13 +37,18 @@ async function invokeRespec(url: URL, params: URLSearchParams) {
       timeout: 30000,
       disableSandbox: true,
       disableGPU: true,
-      ...((dieOn === "error" || dieOn === "everything") && {
-        haltonerror: true,
-      }),
-      ...((dieOn === "warning" || dieOn === "everything") && {
-        haltonwarn: true,
-      }),
     });
+
+    // Mimic respec CLI's haltonerror / haltonwarning behavior
+    const dieOn = params.get("die-on");
+    if (
+      (errors.length && dieOn && dieOn !== "nothing") ||
+      ((errors.length || warnings.length) && dieOn === "everything")
+    ) {
+      throw new SpecGeneratorError(
+        `Did not generate, due to errors exceeding the allowed error level.`,
+      );
+    }
     return { html, errors, warnings };
   } catch (err) {
     throw new SpecGeneratorError(err.message);
