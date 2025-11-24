@@ -3,7 +3,6 @@ import { describe, it } from "node:test";
 
 import {
   createErrorStatusTestCallback,
-  createSuite,
   expectSuccessStatus,
   failOnRejection,
   testFetchHelpers,
@@ -21,7 +20,7 @@ const expectNoFailedIncludes = async (response: Response) => {
 
 const { get, post, testAll } = testFetchHelpers;
 
-createSuite("ReSpec", () => {
+describe("ReSpec", () => {
   describe("fails when it should", { timeout: 10000 }, () => {
     it("without url or file parameter (GET)", () =>
       get({ type: "respec" }).then(

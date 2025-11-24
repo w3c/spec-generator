@@ -1,8 +1,6 @@
 import assert from "assert";
-import type { Server } from "http";
-import { after, before, describe, it } from "node:test";
+import { it } from "node:test";
 
-import { start } from "../server.js";
 import { appendParams } from "../util.js";
 
 export const expectSuccessStatus = async (
@@ -42,8 +40,8 @@ interface FetchHelpers {
   ) => void;
 }
 
-const PORT = 3000;
-const BASE_URL = `http://localhost:${PORT}/`;
+export const TEST_PORT = 3000;
+const BASE_URL = `http://localhost:${TEST_PORT}/`;
 
 export const testFetchHelpers: FetchHelpers = {
   get(params, init?) {
@@ -71,20 +69,3 @@ export const testFetchHelpers: FetchHelpers = {
     it(`${message} (Mixed)`, () => callback(testFetchHelpers.mixed));
   },
 };
-
-export function createSuite(name: string, callback: () => void) {
-  let testServer: Server;
-
-  describe(`spec-generator: ${name}`, () => {
-    before(async () => {
-      testServer = await start(PORT);
-      // Avoid failure due to test running too soon
-      // (waiting for `listening` event isn't enough?)
-      return new Promise((resolve) => setTimeout(resolve, 15));
-    });
-
-    after(() => testServer.close());
-
-    callback();
-  });
-}

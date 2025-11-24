@@ -2,7 +2,6 @@ import { describe, it } from "node:test";
 
 import {
   createErrorStatusTestCallback,
-  createSuite,
   expectSuccessStatus,
   failOnRejection,
   testFetchHelpers,
@@ -22,7 +21,7 @@ const specFailurePattern =
 const issuesFailurePattern =
   /^\{"error":"fatal error: Missing 'Draft' metadata."\}$/;
 
-createSuite("Bikeshed", () => {
+describe("Bikeshed", () => {
   describe("fails when it should", { timeout: 10000 }, () => {
     it("without url or file parameter (GET)", () =>
       get({ type: "bikeshed-spec" }).then(
