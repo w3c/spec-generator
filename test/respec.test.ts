@@ -20,7 +20,7 @@ const expectNoFailedIncludes = async (response: Response) => {
 const { get, post, testAll } = testFetchHelpers;
 
 createSuite("ReSpec", () => {
-  describe("fails when it should", () => {
+  describe("fails when it should", { timeout: 10000 }, () => {
     it("without url or file parameter (GET)", () =>
       get({ type: "respec" }).then(
         createErrorStatusTestCallback(
@@ -47,7 +47,7 @@ createSuite("ReSpec", () => {
       ));
   });
 
-  describe("succeeds when it should", () => {
+  describe("succeeds when it should", { timeout: 35000 }, () => {
     it("renders form UI upon GET w/ Accept: text/html and no url", () =>
       get({ type: "respec" }, { headers: { Accept: "text/html" } }).then(
         expectSuccessStatus,

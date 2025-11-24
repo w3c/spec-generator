@@ -75,7 +75,7 @@ export const testFetchHelpers: FetchHelpers = {
 export function createSuite(name: string, callback: () => void) {
   let testServer: Server;
 
-  describe(`spec-generator: ${name}`, { timeout: 30000 }, () => {
+  describe(`spec-generator: ${name}`, () => {
     before(async () => {
       testServer = await start(PORT);
       // Avoid failure due to test running too soon

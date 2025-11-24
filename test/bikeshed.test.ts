@@ -23,7 +23,7 @@ const issuesFailurePattern =
   /^\{"error":"fatal error: Missing 'Draft' metadata."\}$/;
 
 createSuite("Bikeshed", () => {
-  describe("fails when it should", () => {
+  describe("fails when it should", { timeout: 10000 }, () => {
     it("without url or file parameter (GET)", () =>
       get({ type: "bikeshed-spec" }).then(
         createErrorStatusTestCallback(
@@ -68,7 +68,7 @@ createSuite("Bikeshed", () => {
     );
   });
 
-  describe("succeeds when it should", () => {
+  describe("succeeds when it should", { timeout: 30000 }, () => {
     it("renders form UI upon GET w/ Accept: text/html and no url", () =>
       get({ type: "bikeshed-spec" }, { headers: { Accept: "text/html" } }).then(
         expectSuccessStatus,
