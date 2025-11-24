@@ -20,9 +20,9 @@ export const expectSuccessStatus = async (
 export const createErrorStatusTestCallback =
   (expectedMessage: RegExp, expectedCode = 400) =>
   async (response: Response) => {
+    assert.equal(response.status, expectedCode);
     const responseText = await response.text();
     assert.match(responseText, expectedMessage);
-    assert.equal(response.status, expectedCode);
   };
 
 export const failOnRejection = (error: Error) =>

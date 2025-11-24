@@ -12,6 +12,8 @@ import {
 const URL_NO_RESPEC = "https://w3c.github.io/wcag/";
 const URL_SUCCESS = `https://w3c.github.io/spec-generator/respec.html`;
 const URL_SUCCESS_RAW = `https://raw.githubusercontent.com/w3c/spec-generator/refs/heads/gh-pages/respec.html`;
+const URL_ERROR = `https://w3c.github.io/spec-generator/respec-with-error.html`;
+const URL_WARNING = `https://w3c.github.io/spec-generator/respec-with-warning.html`;
 
 const expectNoFailedIncludes = async (response: Response) => {
   assert.doesNotMatch(await response.text(), /Cannot GET \//);
@@ -112,7 +114,85 @@ createSuite("ReSpec", () => {
         failOnRejection,
       ),
     );
+  });
 
-    // TODO: test die-on
+  describe("die-on parameter behavior", { timeout: 30000 }, () => {
+    const errorPattern =
+      /^{"error":"Did not generate, due to errors exceeding the allowed error level."}$/;
+
+    testAll("renders spec containing error with die-on=nothing", (request) =>
+      request({
+        "die-on": "nothing",
+        type: "respec",
+        url: URL_ERROR,
+      }).then(expectSuccessStatus, failOnRejection),
+    );
+
+    testAll("renders spec containing error with die-on unset", (request) =>
+      request({
+        type: "respec",
+        url: URL_ERROR,
+      }).then(expectSuccessStatus, failOnRejection),
+    );
+
+    testAll("fails for spec containing error with die-on=error", (request) =>
+      request({
+        "die-on": "error",
+        type: "respec",
+        url: URL_ERROR,
+      }).then(
+        createErrorStatusTestCallback(errorPattern, 500),
+        failOnRejection,
+      ),
+    );
+
+    testAll(
+      "fails for spec containing error with die-on=everything",
+      (request) =>
+        request({
+          "die-on": "everything",
+          type: "respec",
+          url: URL_ERROR,
+        }).then(
+          createErrorStatusTestCallback(errorPattern, 500),
+          failOnRejection,
+        ),
+    );
+
+    testAll("renders spec containing warning with die-on=nothing", (request) =>
+      request({
+        "die-on": "nothing",
+        type: "respec",
+        url: URL_WARNING,
+      }).then(expectSuccessStatus, failOnRejection),
+    );
+
+    testAll("renders spec containing warning with die-on unset", (request) =>
+      request({
+        type: "respec",
+        url: URL_WARNING,
+      }).then(expectSuccessStatus, failOnRejection),
+    );
+
+    testAll("renders spec containing warning with die-on=error", (request) =>
+      request({
+        "die-on": "error",
+        type: "respec",
+        url: URL_WARNING,
+      }).then(expectSuccessStatus, failOnRejection),
+    );
+
+    testAll(
+      "fails for spec containing warning with die-on=everything",
+      (request) =>
+        request({
+          "die-on": "everything",
+          type: "respec",
+          url: URL_WARNING,
+        }).then(
+          createErrorStatusTestCallback(errorPattern, 500),
+          failOnRejection,
+        ),
+    );
   });
 });
