@@ -234,8 +234,16 @@
         <dd>URL to process; required if file is not set</dd>
         <dt>file</dt>
         <dd>
-          File upload to process (POST only); required if url is not set, and
-          takes precedence if both are set
+          <p>
+            File upload to process (POST only); required if url is not set, and
+            takes precedence if both are set.
+          </p>
+          <p>Formats supported:</p>
+          <ul>
+            <li>For ReSpec: HTML file, or tar archive with its entry point at <code>index.html</code></li>
+            <li>For Bikeshed specs: Bikeshed file (typically ending in <code>.bs</code>), or tar archive with its entry point at <code>index.bs</code></li>
+            <li>For Bikeshed issue lists: text file (typically ending in <code>.bsi</code> or <code>.txt</code>)</li>
+          </ul>
         </dd>
         <dt>type</dt>
         <dd>
