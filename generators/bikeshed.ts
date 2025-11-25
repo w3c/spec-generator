@@ -199,6 +199,7 @@ const generateIssuesList = async (input: string) => {
   );
 };
 
+/** Generates response for validated bikeshed requests. */
 export async function generateBikeshed(result: ValidateParamsResult) {
   const { file, params, res, type, url } = result;
 

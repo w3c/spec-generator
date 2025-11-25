@@ -9,7 +9,7 @@ import { toHTML } from "respec";
 import tar from "tar-stream";
 
 import type { ValidateParamsResult } from "../server.js";
-import { getShortIsoDate, appendParams } from "../util.js";
+import { getShortIsoDate, mergeParams } from "../util.js";
 import { SpecGeneratorError } from "./common.js";
 
 async function invokeRespec(url: URL, params: URLSearchParams) {
@@ -22,13 +22,11 @@ async function invokeRespec(url: URL, params: URLSearchParams) {
         configParams.set(key.slice(3), value);
     }
 
-    url.search = appendParams(
-      // Establish today's date as default publish date,
-      // then allow override via md-date, md-publishDate,
-      // or publishDate in ReSpec URL GET parameter
+    url.search = mergeParams(
       new URLSearchParams(
         `publishDate=${encodeURIComponent(params.get("md-date") || getShortIsoDate())}`,
       ),
+      // Allow respecConfig overrides in general via md-* or GET parameter within url
       configParams,
       url.searchParams,
     ).toString();
@@ -73,9 +71,8 @@ async function extractTar(tarFile: Buffer<ArrayBufferLike>) {
     extract.on("entry", (header, stream, next) => {
       stream.on("data", async (data) => {
         if (uploadedFileIsAllowed(header.name)) {
-          if (header.name === "index.html" || header.name === "./index.html") {
+          if (header.name === "index.html" || header.name === "./index.html")
             hasIndex = true;
-          }
           const filePath = `${uploadPath}/${header.name}`;
           await mkdir(dirname(filePath), { recursive: true });
           await writeFile(filePath, data);
@@ -165,6 +162,7 @@ async function resolveUrlOrFile(result: ValidateParamsResult) {
   throw new Error("[respec] Unexpected result; contained neither file nor url");
 }
 
+/** Generates response for validated respec requests. */
 export async function generateRespec(result: ValidateParamsResult) {
   const { params, res } = result;
   const { specUrl, extraPath } = await resolveUrlOrFile(result);

@@ -28,8 +28,8 @@
   },
   "scripts": {
     "build": "tsc --noEmit false",
-    "lint": "tsc && prettier -c '**/*.ts' index.html",
-    "fix": "prettier -w '**/*.ts' index.html",
+    "lint": "tsc && prettier -c '**/*.ts'",
+    "fix": "prettier -w '**/*.ts'",
     "test": "tsx test/index.test.ts",
     "prepare": "husky install",
     "start": "tsx server.ts",

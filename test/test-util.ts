@@ -1,7 +1,7 @@
 import assert from "assert";
 import { it } from "node:test";
 
-import { appendParams } from "../util.js";
+import { mergeParams } from "../util.js";
 
 export const expectSuccessStatus = async (
   response: Response,
@@ -26,10 +26,11 @@ export const createErrorStatusTestCallback =
 export const failOnRejection = (error: Error) =>
   assert.fail(`Unexpected fetch promise rejection: ${error}`);
 
-export type FetchHelper = (
+type FetchHelper = (
   params: Record<string, string>,
   init?: RequestInit,
 ) => Promise<Response>;
+
 interface FetchHelpers {
   get: FetchHelper;
   post: FetchHelper;
@@ -46,23 +47,23 @@ const BASE_URL = `http://localhost:${TEST_PORT}/`;
 export const testFetchHelpers: FetchHelpers = {
   get(params, init?) {
     const url = new URL(BASE_URL);
-    appendParams(url.searchParams, new URLSearchParams(params));
+    mergeParams(url.searchParams, new URLSearchParams(params));
     return fetch(url, init);
   },
   post(params, init?) {
     return fetch(new URL(BASE_URL), {
-      body: appendParams(new FormData(), new URLSearchParams(params)),
+      body: mergeParams(new FormData(), new URLSearchParams(params)),
       method: "POST",
       ...init,
     });
   },
-  /** Fetches via POST, but using GET parameters */
+  /** Fetches via POST, but using GET parameters. */
   mixed(params, init?) {
     const url = new URL(BASE_URL);
-    appendParams(url.searchParams, new URLSearchParams(params));
+    mergeParams(url.searchParams, new URLSearchParams(params));
     return fetch(url, { method: "POST", ...init });
   },
-  /** Runs a test across multiple request permutations */
+  /** Runs a test across multiple permutations of request methods/parameters. */
   async testAll(message, callback) {
     it(`${message} (GET)`, () => callback(testFetchHelpers.get));
     it(`${message} (POST)`, () => callback(testFetchHelpers.post));

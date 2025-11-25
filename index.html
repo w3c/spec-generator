@@ -1,8 +1,8 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spec Generator</title>
     <style>
       html,
@@ -141,19 +141,19 @@
           name="type"
           value="respec"
           checked
-        />&nbsp;<label for="type-respec">ReSpec</label>
+        >&nbsp;<label for="type-respec">ReSpec</label>
         <input
           id="type-bikeshed-spec"
           type="radio"
           name="type"
           value="bikeshed-spec"
-        />&nbsp;<label for="type-bikeshed-spec">Bikeshed Spec</label>
+        >&nbsp;<label for="type-bikeshed-spec">Bikeshed Spec</label>
         <input
           id="type-bikeshed-issues-list"
           type="radio"
           name="type"
           value="bikeshed-issues-list"
-        />&nbsp;<label for="type-bikeshed-issues-list"
+        >&nbsp;<label for="type-bikeshed-issues-list"
           >Bikeshed Issues List</label
         >
       </fieldset>
@@ -175,11 +175,11 @@
         <div class="non-bikeshed-issues-list">
           <div>
             <label for="date">Date <i>(YYYY-MM-DD)</i></label>
-            <input name="md-date" id="date" />
+            <input name="md-date" id="date">
           </div>
         </div>
         <div class="only-bikeshed-spec">
-          <input type="checkbox" name="md-prepare-for-tr" value="yes" id="tr" />
+          <input type="checkbox" name="md-prepare-for-tr" value="yes" id="tr">
           <label for="tr">Prepare for TR</label>
         </div>
       </fieldset>
@@ -196,7 +196,7 @@
             name="url"
             id="url"
             placeholder="https://w3c.github.io/manifest/?specStatus=WD&publishDate=2020-10-20"
-          />
+          >
           <button formmethod="GET">Generate</button>
         </fieldset>
         <fieldset>
@@ -217,7 +217,7 @@
             name="file"
             id="file"
             accept="application/x-tar, text/html, text/plain, .bs, .bsi"
-          />
+          >
           <button formmethod="POST" formenctype="multipart/form-data">
             Upload and Generate
           </button>

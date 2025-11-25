@@ -55,7 +55,8 @@ describe("spec-generator", async () => {
     });
   });
 
-  // Run tests for each generator type
+  // Run tests for each generator type,
+  // within the same top-level suite and server instance
   await import("./bikeshed.test.js");
   await import("./respec.test.js");
 });

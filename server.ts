@@ -11,8 +11,6 @@ import { generateRespec } from "./generators/respec.js";
 import { mergeRequestParams } from "./util.js";
 
 const app = express();
-app.set("view engine", "html");
-app.set("views", ["./partials", "./views"]);
 
 await mkdir("uploads", { recursive: true });
 app.use(
