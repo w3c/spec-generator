@@ -14,7 +14,8 @@ jobs:
       uses: actions/setup-node@v6.0.0
       with:
         node-version: ${{ matrix.node-version }}
-
+    - name: Install bikeshed
+      run: pipx install bikeshed && bikeshed update
     - run: npm install
     - run: npx respec2html -e --timeout 30 --src "https://w3c.github.io/spec-generator/respec.html"
     - run: npm test
