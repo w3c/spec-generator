@@ -28,7 +28,9 @@ export function mergeParams(
  * Merges an Express request's body and query params into one URLSearchParams object.
  */
 export function mergeRequestParams(req: Request) {
-  const queryParams = new URLSearchParams(req.url.slice(req.url.indexOf("?")));
+  const queryParams = new URLSearchParams(
+    req.url.includes("?") ? req.url.slice(req.url.indexOf("?")) : "",
+  );
   if (!req.body) return queryParams;
   return mergeParams(new URLSearchParams(req.body), queryParams);
 }
