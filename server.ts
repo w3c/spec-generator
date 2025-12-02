@@ -16,6 +16,13 @@ await mkdir("uploads", { recursive: true });
 app.use(
   fileUpload({
     createParentPath: true,
+    limits: {
+      fields: 100,
+      files: 1,
+      fileSize: 20 * 1048576,
+      parts: 100,
+    },
+    abortOnLimit: true,
     useTempFiles: true,
     tempFileDir: "uploads/",
   }),
