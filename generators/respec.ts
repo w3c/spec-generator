@@ -66,7 +66,7 @@ async function extractTar(tarFile: Buffer<ArrayBufferLike>) {
   const extract = tar.extract();
   const uploadPath = await mkdtemp("uploads/");
 
-  return new Promise((resolve, reject) => {
+  return new Promise<string>((resolve, reject) => {
     let hasIndex = false;
     extract.on("entry", (header, stream, next) => {
       stream.on("data", async (data) => {
@@ -136,7 +136,7 @@ async function resolveUrlOrFile(result: ValidateParamsResult) {
     const type = await fileTypeFromBuffer(content);
     const isTar = type && type.mime === "application/x-tar";
     const urlPath = isTar
-      ? ((await extractTar(content)) as string)
+      ? (await extractTar(content))
       : file.tempFilePath;
 
     return {
@@ -152,7 +152,7 @@ async function resolveUrlOrFile(result: ValidateParamsResult) {
       const baseUrl = `${req.protocol}://${req.get("host")}/`;
       const newPath = url.replace(rawGithubRegex, `${extraPath}/`);
       return {
-        specUrl: new URL(`${baseUrl}${newPath}${specUrl.search}`),
+        specUrl: new URL(`${newPath}${specUrl.search}`, baseUrl),
         extraPath,
       };
     } else {
