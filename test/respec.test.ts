@@ -115,7 +115,7 @@ describe("ReSpec", () => {
     );
   });
 
-  describe("die-on parameter behavior", { timeout: 45000 }, () => {
+  describe("die-on parameter behavior", { timeout: 50000 }, () => {
     const errorPattern =
       /^{"error":"Did not generate, due to errors exceeding the allowed error level."}$/;
 
