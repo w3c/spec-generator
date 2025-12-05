@@ -5,13 +5,13 @@
   "type": "module",
   "dependencies": {
     "cheerio": "^1.1.2",
-    "express": "^5.1.0",
+    "express": "^5.2.0",
     "express-fileupload": "^1.5.0",
     "file-type": "^21.1.1",
     "filenamify": "^7.0.0",
     "respec": "35.6.0",
     "tar-stream": "^3.1.1",
-    "tsx": "^4.20.6",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   },
   "devDependencies": {
@@ -20,7 +20,7 @@
     "@types/node": "^24.10.0",
     "@types/tar-stream": "^3.1.4",
     "husky": "^9.0.6",
-    "prettier": "^3.6.2"
+    "prettier": "^3.7.3"
   },
   "engines": {
     "node": "20 || 22 || 24",
