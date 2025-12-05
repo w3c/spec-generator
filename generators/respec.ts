@@ -135,13 +135,11 @@ async function resolveUrlOrFile(result: ValidateParamsResult) {
     // file can be an html file or a tar file
     const type = await fileTypeFromBuffer(content);
     const isTar = type && type.mime === "application/x-tar";
-    const urlPath = isTar
-      ? (await extractTar(content))
-      : file.tempFilePath;
+    const urlPath = isTar ? await extractTar(content) : file.tempFilePath;
 
     return {
       // Run ReSpec against static endpoint, as it cannot run against local filesystem
-      specUrl: new URL(`${req.protocol}://${req.get("host")}/${urlPath}`),
+      specUrl: new URL(urlPath, `${req.protocol}://${req.get("host")}`),
       // server.ts will clean up tempFilePath, but needs to be informed of extraction path
       extraPath: isTar ? urlPath : null,
     };
