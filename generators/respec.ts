@@ -37,16 +37,6 @@ async function invokeRespec(url: URL, params: URLSearchParams) {
       disableGPU: true,
     });
 
-    // Mimic respec CLI's haltonerror / haltonwarning behavior
-    const dieOn = params.get("die-on");
-    if (
-      (errors.length && dieOn && dieOn !== "nothing") ||
-      ((errors.length || warnings.length) && dieOn === "everything")
-    ) {
-      throw new SpecGeneratorError(
-        `Did not generate, due to errors exceeding the allowed error level.`,
-      );
-    }
     return { html, errors, warnings };
   } catch (err) {
     throw new SpecGeneratorError(err.message);
@@ -169,7 +159,19 @@ export async function generateRespec(result: ValidateParamsResult) {
     const { html, errors, warnings } = await invokeRespec(specUrl, params);
     res.setHeader("x-errors-count", errors.length);
     res.setHeader("x-warnings-count", warnings.length);
-    res.send(html);
+
+    // Mimic respec CLI's haltonerror / haltonwarning behavior
+    const dieOn = params.get("die-on");
+    if (
+      (errors.length && dieOn && dieOn !== "nothing") ||
+      ((errors.length || warnings.length) && dieOn === "everything")
+    ) {
+      res.status(500).json({
+        error: `Did not generate, due to errors exceeding the allowed error level.`,
+      });
+    } else {
+      res.send(html);
+    }
   } catch (err) {
     res.status(err.status).json({ error: err.message });
   } finally {
