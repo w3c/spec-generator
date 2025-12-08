@@ -56,32 +56,29 @@ async function extractTar(tarFile: Buffer<ArrayBufferLike>) {
   const extract = tar.extract();
   const uploadPath = await mkdtemp("uploads/");
 
-  return new Promise<string>((resolve, reject) => {
-    let hasIndex = false;
-    extract.on("entry", (header, stream, next) => {
-      stream.on("data", async (data) => {
-        if (uploadedFileIsAllowed(header.name)) {
-          if (header.name === "index.html" || header.name === "./index.html")
-            hasIndex = true;
-          const filePath = `${uploadPath}/${header.name}`;
-          await mkdir(dirname(filePath), { recursive: true });
-          await writeFile(filePath, data);
-        }
-      });
-      stream.on("end", () => next());
-      stream.resume();
-    });
-
-    extract.on("finish", () => {
-      if (!hasIndex) {
-        reject("No index.html file");
-      } else {
-        resolve(uploadPath);
+  let hasIndex = false;
+  extract.on("entry", (header, stream, next) => {
+    stream.on("data", async (data) => {
+      if (uploadedFileIsAllowed(header.name)) {
+        if (header.name === "index.html" || header.name === "./index.html")
+          hasIndex = true;
+        const filePath = `${uploadPath}/${header.name}`;
+        await mkdir(dirname(filePath), { recursive: true });
+        await writeFile(filePath, data);
       }
     });
-
-    extract.end(tarFile);
+    stream.on("end", () => next());
+    stream.resume();
   });
+
+  const { promise, resolve, reject } = Promise.withResolvers<string>();
+  extract.on("finish", () => {
+    if (!hasIndex) reject("No index.html file");
+    else resolve(uploadPath);
+  });
+
+  extract.end(tarFile);
+  return promise;
 }
 
 const rawGithubRegex = /https:\/\/raw.githubusercontent.com\/.+?\/.+?\/.+?\//;
