@@ -4,7 +4,7 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: [20.x, 22.x, 24.x]
@@ -15,7 +15,10 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - name: Install bikeshed
-      run: pipx install bikeshed==6 && bikeshed update
+      run: pipx install bikeshed && bikeshed update
     - run: npm install
+    # See https://chromium.googlesource.com/chromium/src/+/main/docs/security/apparmor-userns-restrictions.md
+    - name: Disable AppArmor
+      run: echo 0 | sudo tee /proc/sys/kernel/apparmor_restrict_unprivileged_userns
     - run: npx respec2html -e --timeout 30 --src "https://w3c.github.io/spec-generator/respec.html"
     - run: npm test
