@@ -9,16 +9,16 @@ jobs:
       matrix:
         node-version: [20.x, 22.x, 24.x]
     steps:
-    - uses: actions/checkout@v6
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v6.1.0
-      with:
-        node-version: ${{ matrix.node-version }}
-    - name: Install bikeshed
-      run: pipx install bikeshed && bikeshed update
-    - run: npm install
-    # See https://chromium.googlesource.com/chromium/src/+/main/docs/security/apparmor-userns-restrictions.md
-    - name: Disable AppArmor
-      run: echo 0 | sudo tee /proc/sys/kernel/apparmor_restrict_unprivileged_userns
-    - run: npx respec2html -e --timeout 30 --src "https://w3c.github.io/spec-generator/respec.html"
-    - run: npm test
+      - uses: actions/checkout@v6
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v6.1.0
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install bikeshed
+        run: pipx install bikeshed && bikeshed update
+      - run: npm install
+      # See https://chromium.googlesource.com/chromium/src/+/main/docs/security/apparmor-userns-restrictions.md
+      - name: Disable AppArmor
+        run: echo 0 | sudo tee /proc/sys/kernel/apparmor_restrict_unprivileged_userns
+      - run: npx respec2html -e --timeout 30 --src "https://w3c.github.io/spec-generator/respec.html"
+      - run: npm test
