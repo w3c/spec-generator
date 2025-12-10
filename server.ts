@@ -80,12 +80,26 @@ async function extractTar(tarFile: Buffer<ArrayBufferLike>) {
     });
 }
 
+function setMigrationHeaders(res: ExpressResponse) {
+    res.header("Deprecation", `@${Date.UTC(2015, 11, 15)}`);
+    res.header("Sunset", "Sun, 1 Mar 2026 00:00:00 GMT");
+    res.header(
+        "Link",
+        [
+            // TODO: check deprecation URL after sending email
+            '<https://lists.w3.org/Archives/Public/spec-prod/2025OctDec/0005.html>; rel="deprecation"',
+            '<https://www.w3.org.org/publications/spec-generator/>; rel="alternate"',
+        ].join(", "),
+    );
+}
+
 // Listens to GET at the root, expects two required query string parameters:
 //  type:   the type of the generator (case-insensitive)
 //  url:    the URL to the source document
 app.get(
     "/",
     async (req, res, next) => {
+        setMigrationHeaders(res);
         const type =
             typeof req.query.type === "string"
                 ? req.query.type.toLowerCase()
@@ -202,6 +216,7 @@ async function forwardResponseWithHeaders(
 }
 
 app.post("/", async (req, res) => {
+    setMigrationHeaders(res);
     const file = req.files?.file;
     if (!file) {
         return res.send({

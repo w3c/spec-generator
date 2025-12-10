@@ -79,10 +79,42 @@
         border-top: 0.2rem solid;
         padding: 0.5em;
     }
+
+    .migration {
+        background-color: #f1d0e1;
+        border: 1px solid #c0272d;
+        margin-bottom: 1em;
+    }
+
+    .migration h2 {
+        background-color: #c0272d;
+        color: #fff;
+        font-weight: bold;
+        padding: 0.5rem 1rem;
+    }
+
+    .migration p {
+        margin: 1rem;
+    }
+
+    .migration a,
+    .migration time {
+        font-weight: bold;
+    }
     </style>
 </head>
 <body>
     <form action="">
+        <div class="migration">
+            <h2>spec-generator is moving!</h2>
+            <p>Please update any bookmarks and other references to use the following location:</p>
+            <p><a href="https://www.w3.org.org/publications/spec-generator/">
+                https://www.w3.org.org/publications/spec-generator/
+            </a></p>
+            <p>
+                The current location will be retired on <time datetime="2026-03-01">1 March 2026</time>.
+            </p>
+        </div>
         <h2>Convert ReSpec document to HTML</h2>
         <fieldset style="text-align: right;">
             <label for="type">Generator</label>
