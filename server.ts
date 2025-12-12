@@ -82,7 +82,7 @@ async function extractTar(tarFile: Buffer<ArrayBufferLike>) {
 
 function setMigrationHeaders(res: ExpressResponse) {
     res.header("Deprecation", `@${Date.UTC(2015, 11, 15)}`);
-    res.header("Sunset", "Sun, 1 Mar 2026 00:00:00 GMT");
+    res.header("Sunset", "Mon, 2 Feb 2026 00:00:00 GMT");
     res.header(
         "Link",
         [
