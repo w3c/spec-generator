@@ -48,7 +48,7 @@ describe("ReSpec", () => {
       ));
   });
 
-  describe("succeeds when it should", { timeout: 35000 }, () => {
+  describe("succeeds when it should", { timeout: 60000 }, () => {
     it("renders form UI upon GET w/ Accept: text/html and no url", () =>
       get({ type: "respec" }, { headers: { Accept: "text/html" } }).then(
         expectSuccessStatus,
@@ -86,8 +86,8 @@ describe("ReSpec", () => {
       ),
     );
 
-    it("renders spec with date overridden via md-publishDate", () =>
-      get({
+    testAll("renders spec with date overridden via md-publishDate", (request) =>
+      request({
         type: "respec",
         url: URL_SUCCESS,
         "md-publishDate": "2025-11-10",
@@ -98,7 +98,8 @@ describe("ReSpec", () => {
             /<time class="dt-published" datetime="2025-11-10">10 November 2025</,
           ),
         failOnRejection,
-      ));
+      ),
+    );
 
     testAll("renders spec with date overridden via url", (request) =>
       request({
@@ -113,12 +114,22 @@ describe("ReSpec", () => {
         failOnRejection,
       ),
     );
+
+    testAll(
+      "renders messages instead of spec when output=messages",
+      (request) =>
+        request({
+          type: "respec",
+          output: "messages",
+          url: URL_WARNING,
+        }).then(
+          (response) => expectSuccessStatus(response, /"name":"ReSpecWarning"/),
+          failOnRejection,
+        ),
+    );
   });
 
   describe("die-on parameter behavior", { timeout: 60000 }, () => {
-    const errorPattern =
-      /^{"error":"Did not generate, due to errors exceeding the allowed error level."}$/;
-
     testAll("renders spec containing error with die-on=nothing", (request) =>
       request({
         "die-on": "nothing",
@@ -140,7 +151,7 @@ describe("ReSpec", () => {
         type: "respec",
         url: URL_ERROR,
       }).then(
-        createErrorStatusTestCallback(errorPattern, 500),
+        createErrorStatusTestCallback(/"name":"ReSpecError"/, 422),
         failOnRejection,
       ),
     );
@@ -153,7 +164,7 @@ describe("ReSpec", () => {
           type: "respec",
           url: URL_ERROR,
         }).then(
-          createErrorStatusTestCallback(errorPattern, 500),
+          createErrorStatusTestCallback(/"name":"ReSpecError"/, 422),
           failOnRejection,
         ),
     );
@@ -189,7 +200,7 @@ describe("ReSpec", () => {
           type: "respec",
           url: URL_WARNING,
         }).then(
-          createErrorStatusTestCallback(errorPattern, 500),
+          createErrorStatusTestCallback(/"name":"ReSpecWarning"/, 422),
           failOnRejection,
         ),
     );
