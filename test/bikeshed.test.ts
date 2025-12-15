@@ -11,15 +11,14 @@ import {
 // and contains non-HTTPS W3C URLs.
 const URL_SPEC =
   "https://raw.githubusercontent.com/w3c/sensors/d8b0f67c/usecases.bs";
+const URL_SPEC_FATAL =
+  "https://raw.githubusercontent.com/WICG/background-sync/04f129e5/spec/index.bs";
 const URL_ISSUES_LIST =
   "https://raw.githubusercontent.com/w3c/process/562cddb8/issues-20210603.txt";
 
 const { get, post, testAll } = testFetchHelpers;
 
-const specFailurePattern =
-  /^{"error":"failure: Did not generate, due to errors exceeding the allowed error level."}$/;
-const issuesFailurePattern =
-  /^\{"error":"fatal error: Missing 'Draft' metadata."\}$/;
+const failurePattern = /"messageType":"failure"/;
 
 describe("Bikeshed", () => {
   describe("fails when it should", { timeout: 10000 }, () => {
@@ -41,14 +40,14 @@ describe("Bikeshed", () => {
 
     testAll("spec mode with a non-spec URL", (request) =>
       request({ type: "bikeshed-spec", url: URL_ISSUES_LIST }).then(
-        createErrorStatusTestCallback(specFailurePattern, 500),
+        createErrorStatusTestCallback(failurePattern, 422),
         failOnRejection,
       ),
     );
 
     testAll("issues-list mode with a non-issues-list URL", (request) =>
       request({ type: "bikeshed-issues-list", url: URL_SPEC }).then(
-        createErrorStatusTestCallback(issuesFailurePattern, 500),
+        createErrorStatusTestCallback(failurePattern, 422),
         failOnRejection,
       ),
     );
@@ -61,13 +60,13 @@ describe("Bikeshed", () => {
           url: URL_SPEC,
           "die-on": "warning",
         }).then(
-          createErrorStatusTestCallback(specFailurePattern, 500),
+          createErrorStatusTestCallback(failurePattern, 422),
           failOnRejection,
         ),
     );
   });
 
-  describe("succeeds when it should", { timeout: 30000 }, () => {
+  describe("succeeds when it should", { timeout: 40000 }, () => {
     it("renders form UI upon GET w/ Accept: text/html and no url", () =>
       get({ type: "bikeshed-spec" }, { headers: { Accept: "text/html" } }).then(
         expectSuccessStatus,
@@ -79,6 +78,20 @@ describe("Bikeshed", () => {
         expectSuccessStatus,
         failOnRejection,
       ),
+    );
+
+    testAll(
+      "renders messages instead of spec when output=messages",
+      (request) =>
+        request({
+          type: "bikeshed-spec",
+          output: "messages",
+          url: URL_SPEC,
+        }).then(
+          (response) =>
+            expectSuccessStatus(response, /"messageType":"success",/),
+          failOnRejection,
+        ),
     );
 
     testAll("renders spec with date overridden", (request) =>
@@ -111,6 +124,14 @@ describe("Bikeshed", () => {
             ),
           failOnRejection,
         ),
+    );
+
+    testAll("renders spec with fatal error when die-on=nothing", (request) =>
+      request({
+        type: "bikeshed-spec",
+        url: URL_SPEC_FATAL,
+        "die-on": "nothing",
+      }).then(expectSuccessStatus, failOnRejection),
     );
 
     testAll("renders issues list", (request) =>
