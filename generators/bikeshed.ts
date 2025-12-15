@@ -22,14 +22,18 @@ interface BikeshedMessage {
     | "failure";
   text: string;
 }
-type BikeshedResultMessage = Omit<BikeshedMessage, "messageType">;
 
 interface BikeshedResult {
   html: string;
-  links: BikeshedResultMessage[];
-  lints: BikeshedResultMessage[];
-  warnings: BikeshedResultMessage[];
-  messages: BikeshedResultMessage[];
+  messages: BikeshedMessage[];
+  count: {
+    fatal: number;
+    link: number;
+    lint: number;
+    warning: number;
+    message: number;
+  };
+  success: boolean;
 }
 
 const execAsync = promisify(exec);
@@ -106,59 +110,47 @@ async function invokeBikeshed(
     } else {
       const result: BikeshedResult = {
         html: "",
-        links: [],
-        lints: [],
-        warnings: [],
         messages: [],
+        success: true,
+        count: {
+          fatal: 0,
+          link: 0,
+          lint: 0,
+          warning: 0,
+          message: 0,
+        },
       };
-      const fatals: BikeshedResultMessage[] = [];
-      const outcomes: BikeshedMessage[] = [];
-
-      const stdout = stdoutChunks.join("");
 
       try {
-        const messages = JSON.parse(stdout.trim() || "[]") as BikeshedMessage[];
-        for (const { lineNum, messageType, text } of messages) {
-          if (messageType === "fatal") {
-            fatals.push({ lineNum, text });
-          } else if (messageType === "success" || messageType === "failure") {
-            outcomes.push({ lineNum, messageType, text });
-          } else {
-            const key = `${messageType}s`;
-            if (key in result) {
-              result[key as keyof Omit<BikeshedResult, "html">].push({
-                lineNum,
-                text,
-              });
-            }
+        result.messages = JSON.parse(
+          stdoutChunks.join("").trim() || "[]",
+        ) as BikeshedMessage[];
+        for (const { messageType } of result.messages) {
+          if (messageType === "failure") {
+            result.success = false;
+          } else if (messageType in result.count) {
+            result.count[messageType as keyof typeof result.count]++;
           }
         }
       } catch {
-        fatals.push({
-          lineNum: null,
-          text: "Bikeshed returned incomplete or unexpected output",
-        });
+        throw new SpecGeneratorError(
+          "Bikeshed returned incomplete or unexpected output",
+        );
       }
 
-      // If bikeshed fails, report the most useful message we can find
-      const failure = outcomes.find(
-        ({ messageType }) => messageType === "failure",
-      );
-      if (failure) {
-        reject(new SpecGeneratorError(`failure: ${failure.text}`));
-      } else if (fatals.length > 0) {
-        reject(new SpecGeneratorError(`fatal error: ${fatals[0].text}`));
-      } else if (code) {
+      if (!result.messages.length && code) {
         reject(
           new SpecGeneratorError(`bikeshed process exited with code ${code}`),
         );
-      } else {
+      } else if (result.success) {
         try {
           result.html = await readFile(outputPath, "utf8");
           resolve(result);
         } catch {
           reject(new SpecGeneratorError("bikeshed did not write any output"));
         }
+      } else {
+        resolve(result);
       }
     }
   });
@@ -208,16 +200,14 @@ export async function generateBikeshed(result: ValidateParamsResult) {
   if (!input) return;
 
   try {
-    const { html, ...messages } = await (type === "bikeshed-spec"
+    const { html, count, messages, success } = await (type === "bikeshed-spec"
       ? generateSpec(input, params)
       : generateIssuesList(input));
-    for (const k of Object.keys(messages)) {
-      res.setHeader(
-        `x-${k}-count`,
-        messages[k as keyof typeof messages].length,
-      );
-    }
-    res.send(html);
+    for (const k of Object.keys(count))
+      res.setHeader(`x-${k}s-count`, count[k as keyof typeof count]);
+
+    if (success && params.get("output") !== "messages") res.send(html);
+    else res.status(success ? 200 : 422).json(messages);
   } catch (err) {
     res.status(err.status).json({ error: err.message });
   }

@@ -147,6 +147,14 @@ async function resolveUrlOrFile(result: ValidateParamsResult) {
   throw new Error("[respec] Unexpected result; contained neither file nor url");
 }
 
+/** Deletes (in-place) unnecessary fields from ReSpec error/warning entries. */
+const trimMessages = (messages: ToHTMLMessage[]) =>
+  messages.map((message) => {
+    delete message.elements; // Contains empty objects (not serializable?)
+    delete message.stack; // Stack trace is long and typically obfuscated
+    return message;
+  });
+
 /** Generates response for validated respec requests. */
 export async function generateRespec(result: ValidateParamsResult) {
   const { params, res } = result;
@@ -159,15 +167,15 @@ export async function generateRespec(result: ValidateParamsResult) {
 
     // Mimic respec CLI's haltonerror / haltonwarning behavior
     const dieOn = params.get("die-on");
-    if (
+    const failed =
       (errors.length && dieOn && dieOn !== "nothing") ||
-      ((errors.length || warnings.length) && dieOn === "everything")
-    ) {
-      res.status(500).json({
-        error: `Did not generate, due to errors exceeding the allowed error level.`,
-      });
-    } else {
+      ((errors.length || warnings.length) && dieOn === "everything");
+    if (!failed && params.get("output") !== "messages") {
       res.send(html);
+    } else {
+      res
+        .status(failed ? 422 : 200)
+        .json(trimMessages([...errors, ...warnings]));
     }
   } catch (err) {
     res.status(err.status).json({ error: err.message });

@@ -158,6 +158,22 @@
         >
       </fieldset>
       <fieldset>
+        <legend>Output type</legend>
+        <input
+          id="output-html"
+          type="radio"
+          name="output"
+          value="html"
+          checked
+        >&nbsp;<label for="output-html">HTML</label>
+        <input
+          id="output-messages"
+          type="radio"
+          name="output"
+          value="messages"
+        >&nbsp;<label for="output-messages">Messages</label>
+      </fieldset>
+      <fieldset>
         <legend>Options</legend>
         <div>
           <label for="die-on">Die on</label>
@@ -274,10 +290,30 @@
             <li>everything</li>
           </ul>
         </dd>
+        <dt>output</dt>
+        <dd>
+          <p>Determines what to send in the response body:</p>
+          <dl>
+            <dt><code>html</code> (default upon success)</dt>
+            <dd>The processed document as HTML</dd>
+            <dt><code>messages</code></dt>
+            <dd>Errors, warnings, and (in Bikeshed's case) informational messages as JSON</dd>
+          </dl>
+          <p>
+            If any message is observed at or exceeding the level specified by
+            <code>die-on</code>, spec-generator will send a 422 response and
+            operate in <code>messages</code> output mode regardless of this
+            parameter.
+          </p>
+          <p>
+            Note that the structure of <code>messages</code> entries differs
+            between ReSpec and Bikeshed.
+          </p>
+        </dd>
         <dt>md-&lt;key&gt;</dt>
         <dd>
           <p>
-            Override <code>respecConfig</code> or Bikeshed metadata (e.g.
+            Overrides <code>respecConfig</code> or Bikeshed metadata (e.g.
             <code>md-date=YYYY-MM-DD</code> as exposed in the form above).
           </p>
           <p>
