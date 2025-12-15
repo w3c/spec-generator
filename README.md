@@ -29,7 +29,7 @@ and is available through various package managers.
 pipx install bikeshed
 ```
 
-Note that the latest versions of Bikeshed now require Python 3.12 or later;
+Note that the latest versions of [Bikeshed now require Python 3.12 or later](https://speced.github.io/bikeshed/#install-py3);
 the last versions without this requirement are 5.4.2 or 6.0.0.
 
 ## Running the server
