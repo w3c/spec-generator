@@ -18,8 +18,7 @@ const URL_ISSUES_LIST =
 
 const { get, post, testAll } = testFetchHelpers;
 
-const failurePattern =
-  /"messageType":"failure","text":"Did not generate, due to errors exceeding the allowed error level."/;
+const failurePattern = /"messageType":"failure"/;
 
 describe("Bikeshed", () => {
   describe("fails when it should", { timeout: 10000 }, () => {
@@ -48,8 +47,7 @@ describe("Bikeshed", () => {
 
     testAll("issues-list mode with a non-issues-list URL", (request) =>
       request({ type: "bikeshed-issues-list", url: URL_SPEC }).then(
-        // FIXME: This should return 422 and match failurePattern after speced/bikeshed#3215 is fixed
-        createErrorStatusTestCallback(/"error"/, 500),
+        createErrorStatusTestCallback(failurePattern, 422),
         failOnRejection,
       ),
     );
