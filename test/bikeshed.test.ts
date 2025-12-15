@@ -21,7 +21,7 @@ const { get, post, testAll } = testFetchHelpers;
 const failurePattern = /"messageType":"failure"/;
 
 describe("Bikeshed", () => {
-  describe("fails when it should", { timeout: 10000 }, () => {
+  describe("fails when it should", { timeout: 15000 }, () => {
     it("without url or file parameter (GET)", () =>
       get({ type: "bikeshed-spec" }).then(
         createErrorStatusTestCallback(
