@@ -71,89 +71,91 @@ async function invokeBikeshed(
   // Output HTML to a file to make warnings/errors easier to parse.
   const outputPath = generateFilename(input);
 
-  return new Promise<BikeshedResult>(async (resolve, reject) => {
-    // Use spawn instead of exec to make arguments injection-proof
-    const bikeshedProcess = spawn(
-      "bikeshed",
-      [
-        "--print=json",
-        "--no-update",
-        ...globalOptions,
-        mode,
-        input,
-        outputPath,
-        ...modeOptions,
-      ],
-      { timeout: 30000 },
-    );
-    const pid = bikeshedProcess.pid;
-    console.log(`[bikeshed(${pid})] generating ${mode} ${input}`);
+  const { promise, resolve, reject } = Promise.withResolvers<BikeshedResult>();
 
-    const stdoutChunks: string[] = [];
-    bikeshedProcess.stdout.on("data", (data) => stdoutChunks.push(data));
-    bikeshedProcess.stderr.on("data", (data) =>
-      console.error(`[bikeshed(${pid}) stderr] ${data}`),
-    );
-    bikeshedProcess.on("error", (error) => {
-      console.error(`[bikeshed(${pid}) error]`, error);
-      reject(new SpecGeneratorError(error.message));
-    });
-    bikeshedProcess.on("exit", async (code, signal) => {
-      if (signal === "SIGTERM") {
-        console.error(`[bikeshed(${pid}) SIGTERM]`);
-        reject(
-          new SpecGeneratorError(
-            "bikeshed process timed out or otherwise terminated",
-          ),
+  // Use spawn instead of exec to make arguments injection-proof
+  const bikeshedProcess = spawn(
+    "bikeshed",
+    [
+      "--print=json",
+      "--no-update",
+      ...globalOptions,
+      mode,
+      input,
+      outputPath,
+      ...modeOptions,
+    ],
+    { timeout: 30000 },
+  );
+  const pid = bikeshedProcess.pid;
+  console.log(`[bikeshed(${pid})] generating ${mode} ${input}`);
+
+  const stdoutChunks: string[] = [];
+  bikeshedProcess.stdout.on("data", (data) => stdoutChunks.push(data));
+  bikeshedProcess.stderr.on("data", (data) =>
+    console.error(`[bikeshed(${pid}) stderr] ${data}`),
+  );
+  bikeshedProcess.on("error", (error) => {
+    console.error(`[bikeshed(${pid}) error]`, error);
+    reject(new SpecGeneratorError(error.message));
+  });
+  bikeshedProcess.on("exit", async (code, signal) => {
+    if (signal === "SIGTERM") {
+      console.error(`[bikeshed(${pid}) SIGTERM]`);
+      reject(
+        new SpecGeneratorError(
+          "bikeshed process timed out or otherwise terminated",
+        ),
+      );
+    } else {
+      const result: BikeshedResult = {
+        html: "",
+        messages: [],
+        success: true,
+        count: {
+          fatal: 0,
+          link: 0,
+          lint: 0,
+          warning: 0,
+          message: 0,
+        },
+      };
+
+      try {
+        result.messages = JSON.parse(
+          stdoutChunks.join("").trim() || "[]",
+        ) as BikeshedMessage[];
+        for (const { messageType } of result.messages) {
+          if (messageType === "failure") {
+            result.success = false;
+          } else if (messageType in result.count) {
+            result.count[messageType as keyof typeof result.count]++;
+          }
+        }
+      } catch {
+        throw new SpecGeneratorError(
+          "Bikeshed returned incomplete or unexpected output",
         );
-      } else {
-        const result: BikeshedResult = {
-          html: "",
-          messages: [],
-          success: true,
-          count: {
-            fatal: 0,
-            link: 0,
-            lint: 0,
-            warning: 0,
-            message: 0,
-          },
-        };
-
-        try {
-          result.messages = JSON.parse(
-            stdoutChunks.join("").trim() || "[]",
-          ) as BikeshedMessage[];
-          for (const { messageType } of result.messages) {
-            if (messageType === "failure") {
-              result.success = false;
-            } else if (messageType in result.count) {
-              result.count[messageType as keyof typeof result.count]++;
-            }
-          }
-        } catch {
-          throw new SpecGeneratorError(
-            "Bikeshed returned incomplete or unexpected output",
-          );
-        }
-
-        if (!result.messages.length && code) {
-          reject(
-            new SpecGeneratorError(`bikeshed process exited with code ${code}`),
-          );
-        } else if (result.success) {
-          try {
-            result.html = await readFile(outputPath, "utf8");
-            resolve(result);
-          } catch {
-            reject(new SpecGeneratorError("bikeshed did not write any output"));
-          }
-        } else {
-          resolve(result);
-        }
       }
-    });
-  }).finally(() => unlink(outputPath).catch(() => {}));
+
+      if (!result.messages.length && code) {
+        reject(
+          new SpecGeneratorError(`bikeshed process exited with code ${code}`),
+        );
+      } else if (result.success) {
+        try {
+          result.html = await readFile(outputPath, "utf8");
+          resolve(result);
+        } catch {
+          reject(new SpecGeneratorError("bikeshed did not write any output"));
+        }
+      } else {
+        resolve(result);
+      }
+    }
+  });
+
+  return promise.finally(() => unlink(outputPath).catch(() => {}));
 }
 
 /** Runs `bikeshed spec`, incorporating custom metadata. */

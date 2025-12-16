@@ -112,9 +112,9 @@ app.post("/", async (req, res) => {
  */
 export const start = (port = parseInt(process.env.PORT || "", 10) || 8000) => {
   console.log(`spec-generator listening on port ${port}`);
-  return new Promise<Server>((resolve) => {
-    const server = app.listen(port, () => resolve(server));
-  });
+  const { promise, resolve } = Promise.withResolvers<Server>();
+  const server = app.listen(port, () => resolve(server));
+  return promise;
 };
 
 if (process.argv[1] === fileURLToPath(import.meta.url) || process.env.pm_id)
