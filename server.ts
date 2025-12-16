@@ -86,8 +86,7 @@ function setMigrationHeaders(res: ExpressResponse) {
     res.header(
         "Link",
         [
-            // TODO: check deprecation URL after sending email
-            '<https://lists.w3.org/Archives/Public/spec-prod/2025OctDec/0005.html>; rel="deprecation"',
+            '<https://lists.w3.org/Archives/Public/spec-prod/2025OctDec/0008.html>; rel="deprecation"',
             '<https://www.w3.org.org/publications/spec-generator/>; rel="alternate"',
         ].join(", "),
     );
