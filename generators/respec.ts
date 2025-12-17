@@ -85,9 +85,15 @@ const rawGithubRegex = /https:\/\/raw.githubusercontent.com\/.+?\/.+?\/.+?\//;
 
 async function crawlRaw(url: string) {
   const uploadPath = await mkdtemp("uploads/");
-  const originalDocument = await fetch(url);
+  const response = await fetch(url);
+  if (response.status >= 400) {
+    throw new SpecGeneratorError({
+      message: `${response.status} status received from raw.githubusercontent.com request (check URL?)`,
+      status: 400,
+    });
+  }
   const basePath = url.match(rawGithubRegex)![0];
-  const $ = load(await originalDocument.text());
+  const $ = load(await response.text());
   const index = url.replace(/(\?|#).+/, "");
   const links = [index];
   $("[href], [src], [data-include]").each((_, el) => {
