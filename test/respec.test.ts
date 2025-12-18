@@ -11,6 +11,7 @@ import {
 const URL_NO_RESPEC = "https://w3c.github.io/wcag/";
 const URL_SUCCESS = `https://w3c.github.io/spec-generator/respec.html`;
 const URL_SUCCESS_RAW = `https://raw.githubusercontent.com/w3c/spec-generator/refs/heads/gh-pages/respec.html`;
+const URL_404_RAW = `https://raw.githubusercontent.com/w3c/spec-generator/refs/heads/gh-pages/404.html`;
 const URL_ERROR = `https://w3c.github.io/spec-generator/respec-with-error.html`;
 const URL_WARNING = `https://w3c.github.io/spec-generator/respec-with-warning.html`;
 
@@ -45,6 +46,14 @@ describe("ReSpec", () => {
           500,
         ),
         failOnRejection,
+      ));
+
+    it("if the URL points to raw.githubusercontent but responds with 4xx", () =>
+      get({ type: "respec", url: URL_404_RAW }).then(
+        createErrorStatusTestCallback(
+          /{"error":"404 status received from raw.githubusercontent.com/,
+          400,
+        ),
       ));
   });
 

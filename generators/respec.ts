@@ -73,7 +73,10 @@ async function extractTar(tarFile: Buffer<ArrayBufferLike>) {
 
   const { promise, resolve, reject } = Promise.withResolvers<string>();
   extract.on("finish", () => {
-    if (!hasIndex) reject("No index.html file");
+    if (!hasIndex)
+      reject(
+        new SpecGeneratorError({ message: "No index.html file", status: 400 }),
+      );
     else resolve(uploadPath);
   });
 
@@ -164,28 +167,33 @@ const trimMessages = (messages: ToHTMLMessage[]) =>
 /** Generates response for validated respec requests. */
 export async function generateRespec(result: ValidateParamsResult) {
   const { params, res } = result;
-  const { specUrl, extraPath } = await resolveUrlOrFile(result);
 
   try {
-    const { html, errors, warnings } = await invokeRespec(specUrl, params);
-    res.setHeader("x-errors-count", errors.length);
-    res.setHeader("x-warnings-count", warnings.length);
+    const { specUrl, extraPath } = await resolveUrlOrFile(result);
 
-    // Mimic respec CLI's haltonerror / haltonwarning behavior
-    const dieOn = params.get("die-on");
-    const failed =
-      (errors.length && dieOn && dieOn !== "nothing") ||
-      ((errors.length || warnings.length) && dieOn === "everything");
-    if (!failed && params.get("output") !== "messages") {
-      res.send(html);
-    } else {
-      res
-        .status(failed ? 422 : 200)
-        .json(trimMessages([...errors, ...warnings]));
+    try {
+      const { html, errors, warnings } = await invokeRespec(specUrl, params);
+      res.setHeader("x-errors-count", errors.length);
+      res.setHeader("x-warnings-count", warnings.length);
+
+      // Mimic respec CLI's haltonerror / haltonwarning behavior
+      const dieOn = params.get("die-on");
+      const failed =
+        (errors.length && dieOn && dieOn !== "nothing") ||
+        ((errors.length || warnings.length) && dieOn === "everything");
+      if (!failed && params.get("output") !== "messages") {
+        res.send(html);
+      } else {
+        res
+          .status(failed ? 422 : 200)
+          .json(trimMessages([...errors, ...warnings]));
+      }
+    } catch (err) {
+      res.status(err.status || 500).json({ error: err.message });
+    } finally {
+      if (extraPath) await rm(extraPath, { recursive: true }).catch(() => {});
     }
   } catch (err) {
-    res.status(err.status).json({ error: err.message });
-  } finally {
-    if (extraPath) await rm(extraPath, { recursive: true }).catch(() => {});
+    res.status(err.status || 500).json({ error: err.message });
   }
 }
