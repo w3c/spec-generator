@@ -1,6 +1,6 @@
 {
   "name": "w3c-spec-generator",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "license": "MIT",
   "type": "module",
   "dependencies": {
