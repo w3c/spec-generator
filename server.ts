@@ -87,7 +87,7 @@ function setMigrationHeaders(res: ExpressResponse) {
         "Link",
         [
             '<https://lists.w3.org/Archives/Public/spec-prod/2025OctDec/0008.html>; rel="deprecation"',
-            '<https://www.w3.org.org/publications/spec-generator/>; rel="alternate"',
+            '<https://www.w3.org/publications/spec-generator/>; rel="alternate"',
         ].join(", "),
     );
 }
