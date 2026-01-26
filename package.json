@@ -4,7 +4,7 @@
   "license": "MIT",
   "type": "module",
   "dependencies": {
-    "cheerio": "^1.1.2",
+    "cheerio": "^1.2.0",
     "express": "^5.2.0",
     "express-fileupload": "^1.5.0",
     "file-type": "^21.3.0",
