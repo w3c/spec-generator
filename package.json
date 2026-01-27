@@ -5,22 +5,22 @@
   "type": "module",
   "dependencies": {
     "cheerio": "^1.2.0",
-    "express": "^5.2.0",
+    "express": "^5.2.1",
     "express-fileupload": "^1.5.0",
     "file-type": "^21.3.0",
-    "filenamify": "^7.0.0",
-    "respec": "35.6.0",
+    "filenamify": "^7.0.1",
+    "respec": "35.6.1",
     "tar-stream": "^3.1.1",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   },
   "devDependencies": {
-    "@types/express": "^5.0.3",
+    "@types/express": "^5.0.6",
     "@types/express-fileupload": "^1.5.1",
-    "@types/node": "^24.10.0",
+    "@types/node": "^24.10.9",
     "@types/tar-stream": "^3.1.4",
     "husky": "^9.0.6",
-    "prettier": "^3.8.0"
+    "prettier": "^3.8.1"
   },
   "engines": {
     "node": "22 || 24",
