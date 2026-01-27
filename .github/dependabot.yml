@@ -6,11 +6,14 @@ updates:
     interval: weekly
     time: '00:00'
   open-pull-requests-limit: 20
+  groups:
+    patches:
+      update-types: ["patch"]
   ignore:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-patch"]
-      - dependency-name: "husky"
-        update-types: ['version-update:semver-minor']
+    - dependency-name: "@types/node"
+      update-types: ["version-update:semver-major"]
+    - dependency-name: "husky"
+      update-types: ['version-update:semver-minor']
 - package-ecosystem: github-actions
   directory: '/'
   schedule:
