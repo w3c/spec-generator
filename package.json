@@ -7,7 +7,7 @@
     "cheerio": "^1.2.0",
     "express": "^5.2.1",
     "express-fileupload": "^1.5.0",
-    "file-type": "^21.3.2",
+    "file-type": "^21.3.3",
     "filenamify": "^7.0.1",
     "respec": "35.8.0",
     "tar-stream": "^3.1.8",
