@@ -17,6 +17,12 @@ jobs:
       - name: Install bikeshed
         run: pipx install bikeshed && bikeshed update
       - run: npm install
+      - name: Debug Puppeteer install state
+        run: |
+          npm ls puppeteer puppeteer-core || true
+          echo "PUPPETEER_SKIP_DOWNLOAD=$PUPPETEER_SKIP_DOWNLOAD"
+          echo "HOME=$HOME"
+          ls -R ~/.cache/puppeteer || true
       # See https://chromium.googlesource.com/chromium/src/+/main/docs/security/apparmor-userns-restrictions.md
       - name: Disable AppArmor
         run: echo 0 | sudo tee /proc/sys/kernel/apparmor_restrict_unprivileged_userns
