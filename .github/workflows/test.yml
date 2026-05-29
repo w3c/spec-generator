@@ -2,6 +2,11 @@ name: spec-generator tests
 
 on: [push, pull_request, workflow_dispatch]
 
+env:
+  PUPPETEER_DANGEROUS_NO_SANDBOX: 1
+  PUPPETEER_EXECUTABLE_PATH: /usr/bin/google-chrome
+  PUPPETEER_SKIP_DOWNLOAD: 1
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -17,17 +22,5 @@ jobs:
       - name: Install bikeshed
         run: pipx install bikeshed && bikeshed update
       - run: npm install
-      - name: Clean puppeteer cache
-        run: rm -rf ~/.cache/puppeteer
-      - run: npx puppeteer browsers install chrome
-      - name: Debug Puppeteer install state
-        run: |
-          npm ls puppeteer puppeteer-core || true
-          echo "PUPPETEER_SKIP_DOWNLOAD=$PUPPETEER_SKIP_DOWNLOAD"
-          echo "HOME=$HOME"
-          ls -R ~/.cache/puppeteer || true
-      # See https://chromium.googlesource.com/chromium/src/+/main/docs/security/apparmor-userns-restrictions.md
-      - name: Disable AppArmor
-        run: echo 0 | sudo tee /proc/sys/kernel/apparmor_restrict_unprivileged_userns
       - run: npx respec2html -e --timeout 30 --src "https://w3c.github.io/spec-generator/respec.html"
       - run: npm test
