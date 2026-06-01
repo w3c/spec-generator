@@ -3,7 +3,6 @@ name: spec-generator tests
 on: [push, pull_request, workflow_dispatch]
 
 env:
-  PUPPETEER_DANGEROUS_NO_SANDBOX: 1
   PUPPETEER_EXECUTABLE_PATH: /usr/bin/google-chrome
   PUPPETEER_SKIP_DOWNLOAD: 1
 
