@@ -2,6 +2,10 @@ name: spec-generator tests
 
 on: [push, pull_request, workflow_dispatch]
 
+env:
+  PUPPETEER_EXECUTABLE_PATH: /usr/bin/google-chrome
+  PUPPETEER_SKIP_DOWNLOAD: 1
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -17,8 +21,5 @@ jobs:
       - name: Install bikeshed
         run: pipx install bikeshed && bikeshed update
       - run: npm install
-      # See https://chromium.googlesource.com/chromium/src/+/main/docs/security/apparmor-userns-restrictions.md
-      - name: Disable AppArmor
-        run: echo 0 | sudo tee /proc/sys/kernel/apparmor_restrict_unprivileged_userns
       - run: npx respec2html -e --timeout 30 --src "https://w3c.github.io/spec-generator/respec.html"
       - run: npm test

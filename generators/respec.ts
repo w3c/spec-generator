@@ -33,7 +33,6 @@ async function invokeRespec(url: URL, params: URLSearchParams) {
 
     const { html, errors, warnings } = await toHTML(url.href, {
       timeout: 30000,
-      disableSandbox: true,
       disableGPU: true,
     });
 
