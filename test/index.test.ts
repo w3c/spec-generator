@@ -59,4 +59,5 @@ describe("spec-generator", async () => {
   // within the same top-level suite and server instance
   await import("./bikeshed.test.js");
   await import("./respec.test.js");
+  await import("./ssrf.test.js");
 });

@@ -9,6 +9,7 @@ import { toHTML } from "respec";
 import tar from "tar-stream";
 
 import type { ValidateParamsResult } from "../server.js";
+import { safeFetch, checkHostname } from "../ssrf.js";
 import { getShortIsoDate, mergeParams } from "../util.js";
 import { SpecGeneratorError } from "./common.js";
 
@@ -87,7 +88,7 @@ const rawGithubRegex = /https:\/\/raw.githubusercontent.com\/.+?\/.+?\/.+?\//;
 
 async function crawlRaw(url: string) {
   const uploadPath = await mkdtemp("uploads/");
-  const response = await fetch(url);
+  const response = await safeFetch(url);
   if (response.status >= 400) {
     throw new SpecGeneratorError({
       message: `${response.status} status received from raw.githubusercontent.com request (check URL?)`,
@@ -116,7 +117,7 @@ async function crawlRaw(url: string) {
     await mkdir(`${uploadPath}/${dirname(name)}`, {
       recursive: true,
     });
-    const response = await fetch(l);
+    const response = await safeFetch(l);
     await writeFile(`${uploadPath}/${name}`, await response.bytes());
   }
 
@@ -149,6 +150,7 @@ async function resolveUrlOrFile(result: ValidateParamsResult) {
         extraPath,
       };
     } else {
+      await checkHostname(new URL(url).hostname);
       return { specUrl: new URL(url) };
     }
   }

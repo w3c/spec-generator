@@ -7,6 +7,7 @@ import { promisify } from "util";
 import filenamify from "filenamify";
 
 import type { ValidateParamsResult } from "../server.js";
+import { safeFetch } from "../ssrf.js";
 import { SpecGeneratorError } from "./common.js";
 
 interface BikeshedMessage {
@@ -178,7 +179,7 @@ const generateIssuesList = async (input: string) => {
   if (!/^https?:\/\//.test(input)) return invokeBikeshed(input, "issues-list");
 
   const filename = generateFilename(input);
-  const response = await fetch(input);
+  const response = await safeFetch(input);
   if (response.status >= 400) {
     throw new SpecGeneratorError(
       `URL ${input} responded with ${response.status} status`,
