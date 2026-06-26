@@ -9,6 +9,7 @@
     "express-fileupload": "^1.5.0",
     "file-type": "^22.0.1",
     "filenamify": "^7.0.2",
+    "ipaddr.js": "^2.4.0",
     "respec": "37.1.0",
     "tar-stream": "^3.2.0",
     "tsx": "^4.22.4",
