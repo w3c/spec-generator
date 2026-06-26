@@ -10,7 +10,7 @@ import {
   testFetchHelpers,
 } from "./test-util.js";
 
-const { get, post } = testFetchHelpers;
+const { get, post, testAll } = testFetchHelpers;
 
 describe("spec-generator", async () => {
   let testServer: Server;
@@ -44,6 +44,42 @@ describe("spec-generator", async () => {
           createErrorStatusTestCallback(/^{"error":"Missing type"}$/),
           failOnRejection,
         ));
+
+      describe("invalid URLs", () => {
+        const urls = [
+          // incomplete URL
+          "//w3.org",
+          "/publications/",
+          // wrong protocol
+          "ftp://example.com",
+          // localhost (loopback)
+          "http://127.0.0.1",
+          "http://[::1]",
+          "http://localhost",
+          // private
+          "https://192.168.1.2",
+          "https://10.100.11.2",
+          // linkLocal
+          "https://169.254.1.2",
+          "https://[fe80::1]",
+          "https://[::ffff:a9fe:102]", // IPv4-mapped IPv6 address
+          // uniqueLocal
+          "https://[fd00::1]",
+        ];
+
+        const types = ["bikeshed-spec", "bikeshed-issues-list", "respec"];
+
+        for (const url of urls) {
+          for (const type of types) {
+            testAll(`responds with 400 status for ${type} ${url}`, (request) =>
+              request({ type, url }).then(
+                createErrorStatusTestCallback(/^{"error":"Invalid url"}$/),
+                failOnRejection,
+              ),
+            );
+          }
+        }
+      });
     });
 
     describe("succeeds when it should", () => {

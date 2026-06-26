@@ -7,6 +7,7 @@ import { promisify } from "util";
 import filenamify from "filenamify";
 
 import type { ValidateParamsResult } from "../server.js";
+import { httpsProtocolPattern } from "../util.js";
 import { SpecGeneratorError } from "./common.js";
 
 interface BikeshedMessage {
@@ -175,7 +176,8 @@ const generateSpec = async (input: string, params: URLSearchParams) => {
 
 /** Runs `bikeshed issues-list`, fetching from remote server if a URL is specified. */
 const generateIssuesList = async (input: string) => {
-  if (!/^https?:\/\//.test(input)) return invokeBikeshed(input, "issues-list");
+  if (!httpsProtocolPattern.test(input))
+    return invokeBikeshed(input, "issues-list");
 
   const filename = generateFilename(input);
   const response = await fetch(input);

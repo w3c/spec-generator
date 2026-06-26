@@ -8,7 +8,7 @@ import fileUpload from "express-fileupload";
 
 import { generateBikeshed } from "./generators/bikeshed.js";
 import { generateRespec } from "./generators/respec.js";
-import { mergeRequestParams } from "./util.js";
+import { isUnicastHttpUrl, mergeRequestParams } from "./util.js";
 
 const app = express();
 
@@ -45,7 +45,7 @@ const FORM_HTML = await readFile("index.html", "utf-8");
  * In other cases, returns an object with information derived from the request,
  * and leaves the response to the consuming function.
  */
-function validateParams(req: Request, res: Response) {
+async function validateParams(req: Request, res: Response) {
   const params = mergeRequestParams(req);
   const type = params.get("type");
   const url = params.get("url");
@@ -78,10 +78,17 @@ function validateParams(req: Request, res: Response) {
     return null;
   }
 
+  if (url && !(await isUnicastHttpUrl(url))) {
+    res.status(400).json({
+      error: "Invalid url",
+    });
+    return null;
+  }
+
   return { file, params, req, res, type, url };
 }
 export type ValidateParamsResult = NonNullable<
-  ReturnType<typeof validateParams>
+  Awaited<ReturnType<typeof validateParams>>
 >;
 
 const handlers = {
@@ -94,13 +101,13 @@ const isGeneratorType = (type: string): type is GeneratorType =>
   handlers.hasOwnProperty(type);
 
 app.get("/", async (req, res) => {
-  const result = validateParams(req, res);
+  const result = await validateParams(req, res);
   if (!result) return;
   await handlers[result.type](result);
 });
 
 app.post("/", async (req, res) => {
-  const result = validateParams(req, res);
+  const result = await validateParams(req, res);
   if (!result) return;
   await handlers[result.type](result);
   if (result.file) await unlink(result.file.tempFilePath).catch(() => {});
