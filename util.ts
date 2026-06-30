@@ -48,11 +48,16 @@ async function resolveUrlToIpAddress({ hostname }: URL) {
   if (ipaddr.isValid(hostname)) return hostname;
   const maybeIPv6Hostname = hostname.replace(/^\[(.+)\]$/, "$1");
   if (ipaddr.isValid(maybeIPv6Hostname)) return maybeIPv6Hostname;
-  return (await lookup(hostname)).address;
+  try {
+    return (await lookup(hostname)).address;
+  } catch {
+    return null;
+  }
 }
 
 /** Parses an IP to check whether it is unicast. */
-function isUnicastIp(ip: string) {
+function isUnicastIp(ip: string | null) {
+  if (!ip) return false; // If ip is null, assume DNS lookup failure
   const parsedIp = ipaddr.parse(ip);
   const range =
     parsedIp instanceof ipaddr.IPv6 && parsedIp.isIPv4MappedAddress()
