@@ -46,6 +46,33 @@ describe("spec-generator", async () => {
         ));
 
       describe("invalid URLs", () => {
+        const originalFetch = globalThis.fetch;
+
+        before(() => {
+          globalThis.fetch = async (input, init) => {
+            const urlStr = "" + input;
+            if (urlStr.includes("//w3.org/malicious-example/"))
+              return new Response(null, {
+                headers: { location: "http://192.168.1.2/" },
+                status: 301,
+              });
+            else if (urlStr.includes("//192.168.1.2"))
+              return new Response(null, { status: 200 });
+            else if (urlStr.includes("//w3.org/broken-example/"))
+              return new Response(null, {
+                headers: { location: "https://w3.org/broken-example/" },
+                status: 302,
+              });
+
+            // Pass through to allow actual server API calls to proceed as usual
+            return originalFetch(input, init);
+          };
+        });
+
+        after(() => {
+          globalThis.fetch = originalFetch;
+        });
+
         const urls = [
           // incomplete URL
           "//w3.org",
@@ -65,6 +92,9 @@ describe("spec-generator", async () => {
           "https://[::ffff:a9fe:102]", // IPv4-mapped IPv6 address
           // uniqueLocal
           "https://[fd00::1]",
+          // External URLs (not real, but need to use a real domain to avoid DNS lookup failures)
+          "https://w3.org/malicious-example/", // Redirects to internal IP via header
+          "https://w3.org/broken-example/", // Redirects infinitely
         ];
 
         const types = ["bikeshed-spec", "bikeshed-issues-list", "respec"];
