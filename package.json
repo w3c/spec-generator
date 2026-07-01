@@ -20,7 +20,7 @@
     "@types/node": "^24.13.2",
     "@types/tar-stream": "^3.1.4",
     "husky": "^9.0.6",
-    "prettier": "^3.8.4"
+    "prettier": "^3.9.4"
   },
   "engines": {
     "node": "22 || 24",
