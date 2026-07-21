@@ -14,13 +14,7 @@ interface BikeshedMessage {
   lineNum: string | null;
   /** One of the message types enumerated in bikeshed/messages.py */
   messageType:
-    | "fatal"
-    | "link"
-    | "lint"
-    | "warning"
-    | "message"
-    | "success"
-    | "failure";
+    "fatal" | "link" | "lint" | "warning" | "message" | "success" | "failure";
   text: string;
 }
 
