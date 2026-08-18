@@ -12,6 +12,7 @@ const URL_NO_RESPEC = "https://w3c.github.io/wcag/";
 const URL_SUCCESS = `https://w3c.github.io/spec-generator/respec.html`;
 const URL_SUCCESS_RAW = `https://raw.githubusercontent.com/w3c/spec-generator/refs/heads/gh-pages/respec.html`;
 const URL_404_RAW = `https://raw.githubusercontent.com/w3c/spec-generator/refs/heads/gh-pages/404.html`;
+const URL_404LINK_RAW = `https://raw.githubusercontent.com/w3c/vc-recognized-entities/49eaf7bd/index.html`;
 const URL_ERROR = `https://w3c.github.io/spec-generator/respec-with-error.html`;
 const URL_WARNING = `https://w3c.github.io/spec-generator/respec-with-warning.html`;
 
@@ -51,7 +52,15 @@ describe("ReSpec", () => {
     it("if the URL points to raw.githubusercontent but responds with 4xx", () =>
       get({ type: "respec", url: URL_404_RAW }).then(
         createErrorStatusTestCallback(
-          /{"error":"404 status received from raw.githubusercontent.com/,
+          /{"error":"404 status received from specified URL https:\/\/raw\.githubusercontent.com\//,
+          400,
+        ),
+      ));
+
+    it("if the URL points to raw.githubusercontent and a link in the document responds with 4xx", () =>
+      get({ type: "respec", url: URL_404LINK_RAW }).then(
+        createErrorStatusTestCallback(
+          /{"error":"404 status received when following link to https:\/\/raw\.githubusercontent\.com\//,
           400,
         ),
       ));
