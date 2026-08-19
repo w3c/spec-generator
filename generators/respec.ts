@@ -90,7 +90,7 @@ async function crawlRaw(url: string) {
   const response = await fetch(url);
   if (response.status >= 400) {
     throw new SpecGeneratorError({
-      message: `${response.status} status received from raw.githubusercontent.com request (check URL?)`,
+      message: `${response.status} status received from specified URL ${url} (check URL?)`,
       status: 400,
     });
   }
@@ -113,10 +113,16 @@ async function crawlRaw(url: string) {
 
   for (const l of links) {
     const name = l.replace(basePath, "");
+    const response = await fetch(l);
+    if (response.status >= 400) {
+      throw new SpecGeneratorError({
+        message: `${response.status} status received when following link to ${l} (check URL?)`,
+        status: 400,
+      });
+    }
     await mkdir(`${uploadPath}/${dirname(name)}`, {
       recursive: true,
     });
-    const response = await fetch(l);
     await writeFile(`${uploadPath}/${name}`, await response.bytes());
   }
 
