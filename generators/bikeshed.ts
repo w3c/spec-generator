@@ -128,8 +128,10 @@ async function invokeBikeshed(
           }
         }
       } catch {
-        throw new SpecGeneratorError(
-          "Bikeshed returned incomplete or unexpected output",
+        reject(
+          new SpecGeneratorError(
+            "Bikeshed returned incomplete or unexpected output",
+          ),
         );
       }
 
