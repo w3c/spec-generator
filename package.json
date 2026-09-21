@@ -24,7 +24,7 @@
     "prettier": "^3.9.6"
   },
   "engines": {
-    "node": "22 || 24 || 26",
+    "node": "24 || 26",
     "npm": ">=7"
   },
   "scripts": {
