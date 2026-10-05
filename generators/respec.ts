@@ -63,7 +63,8 @@ async function extractTar(tarFile: Buffer<ArrayBufferLike>) {
           hasIndex = true;
         const filePath = `${uploadPath}/${header.name}`;
         await mkdir(dirname(filePath), { recursive: true });
-        await writeFile(filePath, data);
+        // tar-stream uses streamx typings, which type data as unknown
+        await writeFile(filePath, data as any as Buffer);
       }
     });
     stream.on("end", () => next());
