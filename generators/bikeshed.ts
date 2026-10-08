@@ -1,6 +1,5 @@
 import { exec, spawn } from "child_process";
 import { readFile, unlink, writeFile } from "fs/promises";
-import { tmpdir } from "os";
 import { join } from "path";
 import { promisify } from "util";
 
@@ -9,6 +8,7 @@ import filenamify from "filenamify";
 import type { ValidateParamsResult } from "../server.js";
 import { httpsProtocolPattern } from "../util.js";
 import { SpecGeneratorError } from "./common.js";
+import { TEMP_FILE_DIR } from "../constants.js";
 
 interface BikeshedMessage {
   lineNum: string | null;
@@ -42,7 +42,7 @@ if (!bikeshedVersion) {
 }
 
 const generateFilename = (url: string) =>
-  join(tmpdir(), `spec-generator-${Date.now()}-${filenamify(url)}.html`);
+  join(TEMP_FILE_DIR, `spec-generator-${Date.now()}-${filenamify(url)}.html`);
 
 /**
  * Invokes bikeshed on a URL with the given options.
