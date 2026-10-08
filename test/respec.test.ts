@@ -74,8 +74,8 @@ describe("ReSpec", () => {
       ));
 
     testAll("renders valid ReSpec document, via direct URL", (request) =>
-      request({ type: "respec", url: URL_SUCCESS }).then((response) => {
-        expectSuccessStatus(response);
+      request({ type: "respec", url: URL_SUCCESS }).then(async (response) => {
+        await expectSuccessStatus(response);
         expectNoFailedIncludes(response);
       }, failOnRejection),
     );
@@ -83,10 +83,13 @@ describe("ReSpec", () => {
     testAll(
       "renders valid ReSpec document, via raw.githubusercontent",
       (request) =>
-        request({ type: "respec", url: URL_SUCCESS_RAW }).then((response) => {
-          expectSuccessStatus(response);
-          expectNoFailedIncludes(response);
-        }, failOnRejection),
+        request({ type: "respec", url: URL_SUCCESS_RAW }).then(
+          async (response) => {
+            await expectSuccessStatus(response);
+            expectNoFailedIncludes(response);
+          },
+          failOnRejection,
+        ),
     );
 
     testAll("renders spec with date overridden via md-date", (request) =>

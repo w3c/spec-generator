@@ -64,7 +64,7 @@ export const testFetchHelpers: FetchHelpers = {
     return fetch(url, { method: "POST", ...init });
   },
   /** Runs a test across multiple permutations of request methods/parameters. */
-  async testAll(message, callback) {
+  testAll(message, callback) {
     it(`${message} (GET)`, () => callback(testFetchHelpers.get));
     it(`${message} (POST)`, () => callback(testFetchHelpers.post));
     it(`${message} (Mixed)`, () => callback(testFetchHelpers.mixed));
