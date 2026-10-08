@@ -1,0 +1,11 @@
+<pre class="metadata">
+Title: Test spec with no Repository metadata
+Shortname: test-no-repository
+Level: 1
+Status: CG-DRAFT
+Org: W3C
+ED: https://w3c.github.io/spec-generator/
+Editor: Kenneth G. Franqueiro, W3C
+Abstract: This is a test document used by spec-generator's unit tests.
+Markup Shorthands: markdown yes
+</pre>
