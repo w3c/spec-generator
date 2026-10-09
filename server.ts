@@ -1,5 +1,4 @@
 import type { Server } from "http";
-import { rmSync } from "fs";
 import { readFile, rm } from "fs/promises";
 import { extname } from "path";
 import { fileURLToPath } from "url";
@@ -114,6 +113,9 @@ app.post("/", async (req, res) => {
   if (result.file) await rm(result.file.tempFilePath).catch(() => {});
 });
 
+const removeTempFileDir = () =>
+  rm(TEMP_FILE_DIR, { recursive: true }).catch(() => {});
+
 /**
  * Start listening for HTTP requests.
  * @param port - port number to use (optional); defaults to environment variable `$PORT` if exists, and to `8000` if not
@@ -123,9 +125,7 @@ export const start = (port = parseInt(process.env.PORT || "", 10) || 8000) => {
   const { promise, resolve } = Promise.withResolvers<Server>();
 
   const server = app.listen(port, () => resolve(server));
-  server.on("close", async () => {
-    await rm(TEMP_FILE_DIR, { recursive: true }).catch(() => {});
-  });
+  server.on("close", removeTempFileDir);
 
   return promise;
 };
@@ -134,9 +134,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url) || process.env.pm_id) {
   await start();
 
   // Clean up temp folder on termination (which doesn't trigger server close handler)
-  process.on("exit", () => {
-    try {
-      rmSync(TEMP_FILE_DIR, { recursive: true });
-    } catch {}
+  process.on("SIGINT", async () => {
+    await removeTempFileDir();
+    process.exit();
   });
 }
