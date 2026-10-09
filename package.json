@@ -10,7 +10,7 @@
     "file-type": "^22.1.1",
     "filenamify": "^7.0.3",
     "ipaddr.js": "^2.5.0",
-    "respec": "37.3.0",
+    "respec": "37.4.1",
     "tar-stream": "^3.2.2",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2"
