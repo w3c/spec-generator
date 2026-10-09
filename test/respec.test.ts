@@ -76,7 +76,7 @@ describe("ReSpec", () => {
     testAll("renders valid ReSpec document, via direct URL", (request) =>
       request({ type: "respec", url: URL_SUCCESS }).then(async (response) => {
         await expectSuccessStatus(response);
-        expectNoFailedIncludes(response);
+        await expectNoFailedIncludes(response);
       }, failOnRejection),
     );
 
@@ -86,7 +86,7 @@ describe("ReSpec", () => {
         request({ type: "respec", url: URL_SUCCESS_RAW }).then(
           async (response) => {
             await expectSuccessStatus(response);
-            expectNoFailedIncludes(response);
+            await expectNoFailedIncludes(response);
           },
           failOnRejection,
         ),
