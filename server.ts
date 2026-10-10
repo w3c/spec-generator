@@ -1,18 +1,18 @@
 import type { Server } from "http";
-import { mkdir, readFile, unlink } from "fs/promises";
+import { readFile, rm } from "fs/promises";
 import { extname } from "path";
 import { fileURLToPath } from "url";
 
 import express, { type Request, type Response } from "express";
 import fileUpload from "express-fileupload";
 
+import { TEMP_FILE_DIR, UPLOADS_PATH } from "./constants.js";
 import { generateBikeshed } from "./generators/bikeshed.js";
 import { generateRespec } from "./generators/respec.js";
 import { isUnicastHttpUrl, mergeRequestParams } from "./util.js";
 
 const app = express();
 
-await mkdir("uploads", { recursive: true });
 app.use(
   fileUpload({
     createParentPath: true,
@@ -24,12 +24,12 @@ app.use(
     },
     abortOnLimit: true,
     useTempFiles: true,
-    tempFileDir: "uploads/",
+    tempFileDir: TEMP_FILE_DIR,
   }),
 );
 app.use(
-  "/uploads",
-  express.static("./uploads", {
+  `/${UPLOADS_PATH}`,
+  express.static(TEMP_FILE_DIR, {
     setHeaders(res, requestPath) {
       const noExtension = !extname(requestPath);
       if (noExtension) res.setHeader("Content-Type", "text/html");
@@ -110,8 +110,11 @@ app.post("/", async (req, res) => {
   const result = await validateParams(req, res);
   if (!result) return;
   await handlers[result.type](result);
-  if (result.file) await unlink(result.file.tempFilePath).catch(() => {});
+  if (result.file) await rm(result.file.tempFilePath).catch(() => {});
 });
+
+const removeTempFileDir = () =>
+  rm(TEMP_FILE_DIR, { recursive: true }).catch(() => {});
 
 /**
  * Start listening for HTTP requests.
@@ -120,9 +123,19 @@ app.post("/", async (req, res) => {
 export const start = (port = parseInt(process.env.PORT || "", 10) || 8000) => {
   console.log(`spec-generator listening on port ${port}`);
   const { promise, resolve } = Promise.withResolvers<Server>();
+
   const server = app.listen(port, () => resolve(server));
+  server.on("close", removeTempFileDir);
+
   return promise;
 };
 
-if (process.argv[1] === fileURLToPath(import.meta.url) || process.env.pm_id)
+if (process.argv[1] === fileURLToPath(import.meta.url) || process.env.pm_id) {
   await start();
+
+  // Clean up temp folder on termination (which doesn't trigger server close handler)
+  process.on("SIGINT", async () => {
+    await removeTempFileDir();
+    process.exit();
+  });
+}

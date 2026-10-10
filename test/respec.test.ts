@@ -5,6 +5,7 @@ import {
   createErrorStatusTestCallback,
   expectSuccessStatus,
   failOnRejection,
+  getSpecBlob,
   testFetchHelpers,
 } from "./test-util.js";
 
@@ -20,7 +21,7 @@ const expectNoFailedIncludes = async (response: Response) => {
   assert.doesNotMatch(await response.text(), /Cannot GET \//);
 };
 
-const { get, post, testAll } = testFetchHelpers;
+const { get, post, postForm, testAll } = testFetchHelpers;
 
 describe("ReSpec", () => {
   describe("fails when it should", { timeout: 10000 }, () => {
@@ -91,6 +92,20 @@ describe("ReSpec", () => {
           failOnRejection,
         ),
     );
+
+    it("renders valid ReSpec document, via HTML file upload", async () => {
+      const formData = new FormData();
+      formData.set("type", "respec");
+      formData.set("file", await getSpecBlob("respec.html"));
+      return postForm(formData).then(expectSuccessStatus, failOnRejection);
+    });
+
+    it("renders valid ReSpec document, via tar file upload", async () => {
+      const formData = new FormData();
+      formData.set("type", "respec");
+      formData.set("file", await getSpecBlob("respec.tar"));
+      return postForm(formData).then(expectSuccessStatus, failOnRejection);
+    });
 
     testAll("renders spec with date overridden via md-date", (request) =>
       request({

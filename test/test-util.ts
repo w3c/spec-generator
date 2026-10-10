@@ -1,4 +1,6 @@
 import assert from "assert";
+import { readFile } from "fs/promises";
+import { join } from "path";
 import { it } from "node:test";
 
 import { mergeParams } from "../util.js";
@@ -26,14 +28,25 @@ export const createErrorStatusTestCallback =
 export const failOnRejection = (error: Error) =>
   assert.fail(`Unexpected fetch promise rejection: ${error}`);
 
+export const getSpecBlob = async (filename: string) =>
+  new Blob([await readFile(join("test", "specs", filename), "utf8")]);
+
 type FetchHelper = (
   params: Record<string, string>,
+  init?: RequestInit,
+) => Promise<Response>;
+
+type FetchFormHelper = (
+  formData: FormData,
   init?: RequestInit,
 ) => Promise<Response>;
 
 interface FetchHelpers {
   get: FetchHelper;
   post: FetchHelper;
+  /** Fetches via POST, with parameters defined via FormData (to allow for file uploads). */
+  postForm: FetchFormHelper;
+  /** Fetches via POST, but using GET parameters. */
   mixed: FetchHelper;
   testAll: (
     message: string,
@@ -57,7 +70,13 @@ export const testFetchHelpers: FetchHelpers = {
       ...init,
     });
   },
-  /** Fetches via POST, but using GET parameters. */
+  postForm(formData, init?) {
+    return fetch(new URL(BASE_URL), {
+      body: formData,
+      method: "POST",
+      ...init,
+    });
+  },
   mixed(params, init?) {
     const url = new URL(BASE_URL);
     mergeParams(url.searchParams, new URLSearchParams(params));

@@ -1,9 +1,11 @@
+import assert from "assert";
 import { describe, it } from "node:test";
 
 import {
   createErrorStatusTestCallback,
   expectSuccessStatus,
   failOnRejection,
+  getSpecBlob,
   testFetchHelpers,
 } from "./test-util.js";
 
@@ -16,7 +18,7 @@ const URL_SPEC_FATAL =
 const URL_ISSUES_LIST =
   "https://raw.githubusercontent.com/w3c/process/562cddb8/issues-20210603.txt";
 
-const { get, post, testAll } = testFetchHelpers;
+const { get, post, postForm, testAll } = testFetchHelpers;
 
 const failurePattern = /"messageType":"failure"/;
 
@@ -79,6 +81,28 @@ describe("Bikeshed", () => {
         failOnRejection,
       ),
     );
+
+    it("renders spec with no Repository field, via HTML file upload", async () => {
+      const formData = new FormData();
+      formData.set("type", "bikeshed-spec");
+      formData.set("file", await getSpecBlob("bikeshed-no-repo.bs"));
+      return postForm(formData).then(async (response) => {
+        await expectSuccessStatus(response);
+        const responseText = await response.text();
+        assert.doesNotMatch(responseText, /https:\/\/github\.com\//);
+      }, failOnRejection);
+    });
+
+    it("renders spec with no Repository field, via tar file upload", async () => {
+      const formData = new FormData();
+      formData.set("type", "bikeshed-spec");
+      formData.set("file", await getSpecBlob("bikeshed-no-repo.tar"));
+      return postForm(formData).then(async (response) => {
+        await expectSuccessStatus(response);
+        const responseText = await response.text();
+        assert.doesNotMatch(responseText, /https:\/\/github\.com\//);
+      }, failOnRejection);
+    });
 
     testAll(
       "renders messages instead of spec when output=messages",
