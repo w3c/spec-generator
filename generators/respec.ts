@@ -1,13 +1,14 @@
 /// <reference path="./respec.d.ts" />
 
 import { mkdtemp, mkdir, writeFile, rm, readFile } from "fs/promises";
-import { dirname } from "path";
+import { dirname, join } from "path";
 
 import { load } from "cheerio";
 import { fileTypeFromBuffer } from "file-type";
 import { toHTML } from "respec";
 import tar from "tar-stream";
 
+import { TEMP_FILE_DIR, UPLOADS_PATH } from "../constants.js";
 import type { ValidateParamsResult } from "../server.js";
 import { getShortIsoDate, mergeParams } from "../util.js";
 import { SpecGeneratorError } from "./common.js";
@@ -53,7 +54,7 @@ function uploadedFileIsAllowed(name: string) {
 
 async function extractTar(tarFile: Buffer<ArrayBufferLike>) {
   const extract = tar.extract();
-  const uploadPath = await mkdtemp("uploads/");
+  const uploadPath = await mkdtemp(join(TEMP_FILE_DIR, "extracted-"));
 
   let hasIndex = false;
   extract.on("entry", (header, stream, next) => {
@@ -61,7 +62,7 @@ async function extractTar(tarFile: Buffer<ArrayBufferLike>) {
       if (uploadedFileIsAllowed(header.name)) {
         if (header.name === "index.html" || header.name === "./index.html")
           hasIndex = true;
-        const filePath = `${uploadPath}/${header.name}`;
+        const filePath = join(uploadPath, header.name);
         await mkdir(dirname(filePath), { recursive: true });
         // tar-stream uses streamx typings, which type data as unknown
         await writeFile(filePath, data as any as Buffer);
@@ -87,7 +88,7 @@ async function extractTar(tarFile: Buffer<ArrayBufferLike>) {
 const rawGithubRegex = /https:\/\/raw.githubusercontent.com\/.+?\/.+?\/.+?\//;
 
 async function crawlRaw(url: string) {
-  const uploadPath = await mkdtemp("uploads/");
+  const uploadPath = await mkdtemp(join(TEMP_FILE_DIR, "crawled-"));
   const response = await fetch(url);
   if (response.status >= 400) {
     throw new SpecGeneratorError({
@@ -121,10 +122,10 @@ async function crawlRaw(url: string) {
         status: 400,
       });
     }
-    await mkdir(`${uploadPath}/${dirname(name)}`, {
+    await mkdir(join(uploadPath, dirname(name)), {
       recursive: true,
     });
-    await writeFile(`${uploadPath}/${name}`, await response.bytes());
+    await writeFile(join(uploadPath, name), await response.bytes());
   }
 
   return uploadPath;
@@ -137,20 +138,26 @@ async function resolveUrlOrFile(result: ValidateParamsResult) {
     // file can be an html file or a tar file
     const type = await fileTypeFromBuffer(content);
     const isTar = type && type.mime === "application/x-tar";
-    const urlPath = isTar ? await extractTar(content) : file.tempFilePath;
+    const extractedPath = isTar ? await extractTar(content) : file.tempFilePath;
 
     return {
       // Run ReSpec against static endpoint, as it cannot run against local filesystem
-      specUrl: new URL(urlPath, `${req.protocol}://${req.get("host")}`),
+      specUrl: new URL(
+        extractedPath.replace(TEMP_FILE_DIR, UPLOADS_PATH),
+        `${req.protocol}://${req.get("host")}`,
+      ),
       // server.ts will clean up tempFilePath, but needs to be informed of extraction path
-      extraPath: isTar ? urlPath : null,
+      extraPath: isTar ? extractedPath : null,
     };
   } else if (url) {
     const specUrl = new URL(url);
     if (specUrl.hostname === "raw.githubusercontent.com") {
       const extraPath = await crawlRaw(url);
       const baseUrl = `${req.protocol}://${req.get("host")}/`;
-      const newPath = url.replace(rawGithubRegex, `${extraPath}/`);
+      const newPath = url.replace(
+        rawGithubRegex,
+        `${extraPath.replace(TEMP_FILE_DIR, UPLOADS_PATH)}/`,
+      );
       return {
         specUrl: new URL(`${newPath}${specUrl.search}`, baseUrl),
         extraPath,
