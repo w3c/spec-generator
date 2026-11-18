@@ -20,7 +20,7 @@
     "@types/express-fileupload": "^1.5.1",
     "@types/node": "^24.19.2",
     "husky": "^9.0.6",
-    "prettier": "^3.9.10"
+    "prettier": "^3.10.1"
   },
   "engines": {
     "node": "24 || 26"
