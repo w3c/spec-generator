@@ -1,3 +1,4 @@
+
 [![Lint status](https://github.com/w3c/spec-generator/actions/workflows/lint.yml/badge.svg)](https://github.com/w3c/spec-generator/actions/workflows/lint.yml)
 [![Tests status](https://github.com/w3c/spec-generator/actions/workflows/test.yml/badge.svg)](https://github.com/w3c/spec-generator/actions/workflows/test.yml)
 
